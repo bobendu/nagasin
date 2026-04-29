@@ -9,7 +9,7 @@ interface CartItem extends Product {
   dedication?: string;
 }
 
-export default function StoreApp() {
+export default function StoreApp({ isAdmin, onEdit }: { isAdmin?: boolean, onEdit?: () => void }) {
   const [products, setProducts] = useState<Product[]>([])
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
@@ -113,6 +113,20 @@ export default function StoreApp() {
                     ACHETER <ArrowRight size={16} />
                   </button>
                 </div>
+
+                {isAdmin && (
+                  <button 
+                    onClick={onEdit}
+                    style={{ 
+                      marginTop: '1.5rem', width: '100%', padding: '10px', 
+                      background: '#fffbeb', border: '1px solid #fbbf24', 
+                      color: '#92400e', fontWeight: 800, fontSize: '0.75rem', 
+                      cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' 
+                    }}
+                  >
+                    <PenLine size={14} /> ÉDITER CET ARTICLE
+                  </button>
+                )}
               </div>
             </div>
           ))}

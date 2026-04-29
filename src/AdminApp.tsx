@@ -93,7 +93,7 @@ export default function AdminApp({ onBack }: { onBack: () => void }) {
   if (loading) return <div style={{ padding: '4rem', textAlign: 'center' }}>Chargement...</div>
 
   return (
-    <div style={{ padding: '2rem', background: '#f5f5f5', minHeight: '100vh', fontFamily: 'sans-serif' }}>
+    <div style={{ padding: '2rem', background: '#fffbeb', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       <div className="container" style={{ maxWidth: '1000px', margin: '0 auto' }}>
         
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>

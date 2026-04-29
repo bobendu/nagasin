@@ -2,33 +2,33 @@ import { useState, useEffect } from 'react'
 import StoreApp from './StoreApp'
 import AdminApp from './AdminApp'
 import { motion } from 'framer-motion'
-import { Lock } from 'lucide-react'
+import { Lock, Edit3 } from 'lucide-react'
 
 function App() {
-  // On commence par vérifier si l'URL contient déjà l'ordre de passer en Admin
   const isAdminPath = window.location.pathname.includes('nadmin') || window.location.search.includes('nadmin')
   
   const [view, setView] = useState<'maintenance' | 'login' | 'admin' | 'store'>(isAdminPath ? 'login' : 'maintenance')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [password, setPassword] = useState('')
   const [user, setUser] = useState('')
 
-  // Double vérification au chargement
   useEffect(() => {
     if (window.location.pathname.includes('nadmin') || window.location.search.includes('nadmin')) {
-      setView('login')
+      if (!isLoggedIn) setView('login')
     }
-  }, [])
+  }, [isLoggedIn])
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     if (user.toLowerCase() === 'na' && password === 'nagasin2026') {
+      setIsLoggedIn(true)
       setView('admin')
     } else {
       alert("Accès refusé.")
     }
   }
 
-  // --- PAGE DE MAINTENANCE ---
+  // --- MAINTENANCE ---
   if (view === 'maintenance') {
     return (
       <div style={{ height: '100vh', display: 'flex', background: '#e1f0ff' }}>
@@ -45,13 +45,19 @@ function App() {
                Revenez très bientôt pour découvrir les ouvrages et dessins originaux.
              </p>
              <div style={{ marginTop: '3rem', height: '2px', background: '#004369', width: '60px' }}></div>
+             
+             {isLoggedIn && (
+               <button onClick={() => setView('admin')} style={{ marginTop: '4rem', display: 'flex', alignItems: 'center', gap: '10px', background: '#fffbeb', border: '1px solid #fbbf24', padding: '10px 20px', fontWeight: 800, cursor: 'pointer' }}>
+                 <Edit3 size={16} /> REPRENDRE L'ÉDITION
+               </button>
+             )}
           </motion.div>
         </main>
       </div>
     )
   }
 
-  // --- PAGE DE CONNEXION ---
+  // --- LOGIN ---
   if (view === 'login') {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f5f5f5' }}>
@@ -59,31 +65,22 @@ function App() {
           <img src="https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg" alt="na!" style={{ width: '80px', marginBottom: '2rem' }} />
           <h2 style={{ marginBottom: '2rem', fontSize: '1.2rem', fontWeight: 900 }}>ACCÈS RÉSERVÉ</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <input 
-              type="text" placeholder="Identifiant" value={user} onChange={(e) => setUser(e.target.value)}
-              style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '4px', outline: 'none' }}
-            />
-            <input 
-              type="password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)}
-              style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '4px', outline: 'none' }}
-            />
-            <button type="submit" style={{ background: '#000', color: '#fff', padding: '1rem', border: 'none', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-              <Lock size={16} /> SE CONNECTER
-            </button>
-            <button type="button" onClick={() => setView('maintenance')} style={{ background: 'none', border: 'none', color: '#999', fontSize: '0.8rem', cursor: 'pointer', marginTop: '1rem' }}>
-              Retour au site
-            </button>
+            <input type="text" placeholder="Identifiant" value={user} onChange={(e) => setUser(e.target.value)} style={{ padding: '1rem', border: '1px solid #eee' }} />
+            <input type="password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: '1rem', border: '1px solid #eee' }} />
+            <button type="submit" style={{ background: '#000', color: '#fff', padding: '1rem', fontWeight: 800, cursor: 'pointer' }}>SE CONNECTER</button>
           </div>
         </form>
       </div>
     )
   }
 
+  // --- ADMIN DASHBOARD ---
   if (view === 'admin') {
     return <AdminApp onBack={() => setView('store')} />
   }
 
-  return <StoreApp />
+  // --- STORE FRONT ---
+  return <StoreApp isAdmin={isLoggedIn} onEdit={() => setView('admin')} />
 }
 
 export default App
