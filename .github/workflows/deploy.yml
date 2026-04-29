@@ -23,13 +23,13 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Deploy to OVH via FTP
+      - name: Deploy to OVH via SFTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          server-dir: ./www/  # Dossier cible sur OVH
-          protocol: ftp
-          port: 21
+          server-dir: ./www/
+          protocol: sftp
+          port: 22
