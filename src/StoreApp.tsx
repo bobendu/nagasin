@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ShoppingCart, Search, User, Book, ArrowRight } from 'lucide-react'
+import { ShoppingCart, Book, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import './App.css'
 
