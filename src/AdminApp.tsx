@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Save, Package, ArrowLeft, Camera, Loader } from 'lucide-react'
+import { Save, ArrowLeft, Camera, Loader } from 'lucide-react'
 
 interface Product {
   id: number;
