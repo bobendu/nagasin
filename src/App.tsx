@@ -67,7 +67,9 @@ function App() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <input type="text" placeholder="Identifiant" value={user} onChange={(e) => setUser(e.target.value)} style={{ padding: '1rem', border: '1px solid #eee' }} />
             <input type="password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: '1rem', border: '1px solid #eee' }} />
-            <button type="submit" style={{ background: '#000', color: '#fff', padding: '1rem', fontWeight: 800, cursor: 'pointer' }}>SE CONNECTER</button>
+            <button type="submit" style={{ background: '#000', color: '#fff', padding: '1rem', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+              <Lock size={16} /> SE CONNECTER
+            </button>
           </div>
         </form>
       </div>
