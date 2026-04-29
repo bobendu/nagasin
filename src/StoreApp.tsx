@@ -103,7 +103,6 @@ export default function StoreApp() {
                 <img src={item.image} alt={item.title} />
               </div>
               <div>
-                <span style={{ color: 'var(--primary-color)', fontSize: '0.65rem', fontWeight: 900, letterSpacing: '2px' }}>{item.category}</span>
                 <h3 style={{ fontSize: '1.6rem', margin: '0.5rem 0 1rem' }}>{item.title}</h3>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.5', maxWidth: '400px' }}>
                   {item.description}
