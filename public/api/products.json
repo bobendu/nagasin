@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "slug": "codex-maladie-rare",
+    "title": "Le Codex Maladie Rare",
+    "category": "EDITION",
+    "price": 24,
+    "description": "Une exploration graphique et humoristique du monde des maladies rares.",
+    "image": "https://www.dessinateur.net/wp-content/uploads/2018/03/codex-maladie-rare.jpg",
+    "canBeDedicated": true,
+    "stock": 50
+  },
+  {
+    "id": 2,
+    "slug": "hagard-dunord",
+    "title": "Hagard Dunord",
+    "category": "COLLECTION",
+    "price": 19,
+    "description": "Les aventures déjantées du célèbre strip d'Automodélisme.",
+    "image": "https://www.dessinateur.net/wp-content/uploads/2018/03/hagard-dunord.jpg",
+    "canBeDedicated": true,
+    "stock": 20
+  }
+]

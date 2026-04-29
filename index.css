@@ -1,0 +1,124 @@
+:root {
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  font-weight: 400;
+
+  color-scheme: light;
+  --bg-color: #ffffff;
+  --bg-main: #e1f0ff; /* Bleu ciel un peu plus intense */
+  --primary-color: #004369;
+  --text-main: #000000;
+  --text-muted: #666666;
+  --border-color: #f2f2f2;
+  --sidebar-width: 200px; /* Aligné sur la largeur du logo */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  overflow-x: hidden;
+}
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* La Sidebar à gauche */
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  background: white;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  width: 100%;
+  display: block;
+}
+
+.sidebar-logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sidebar-nav {
+  padding: 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: var(--text-main);
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+}
+
+.nav-item:hover {
+  color: var(--primary-color);
+}
+
+/* Le contenu à droite */
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding: 2rem 3rem;
+  background-color: var(--bg-main);
+}
+
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.btn-cta:hover {
+  border-bottom-color: var(--primary-color);
+  gap: 15px;
+}
+
+/* Gestion des images de la boutique */
+.image-container {
+  width: 100%;
+  aspect-ratio: 1; /* Cadre carré standard */
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #eee;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Respect total des proportions */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+}

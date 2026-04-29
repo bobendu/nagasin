@@ -20,3 +20,10 @@
 - Création de la version "Boutique en travaux" sur `App.tsx` pour le site public.
 - Sauvegarde du code de la boutique réelle dans `StoreApp.tsx` pour le développement local.
 - Déploiement du panneau de travaux sur `nagasin.fr`.
+
+## 2026-04-29 : Itération Design "Sketchy Studio"
+- Implémentation du logo officiel "na!" (Blanc sur Bleu).
+- Création de bordures irrégulières via filtres SVG pour un aspect dessiné main.
+- Ajout d'une texture de papier au fond du site.
+- Structuration du catalogue de livres avec des éléments de notation et des badges.
+- Basculement de `App.tsx` vers la boutique pour le développement local.

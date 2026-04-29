@@ -1,24 +1,16 @@
 :root {
   font-family: 'Outfit', 'Inter', system-ui, sans-serif;
-  line-height: 1.5;
+  line-height: 1.6;
   font-weight: 400;
 
   color-scheme: light;
   --bg-color: #ffffff;
-  --surface-color: #f8f9fa;
-  --surface-hover: #f1f3f5;
-  --primary-color: #e63946; /* Rouge dynamique na! */
-  --accent-color: #ffb703; /* Ambre */
-  --text-main: #1a1a1a;
+  --bg-main: #e1f0ff; 
+  --primary-color: #004369;
+  --text-main: #000000;
   --text-muted: #666666;
-  --border-color: #000000;
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.1);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --border-color: #f2f2f2;
+  --sidebar-width: 200px;
 }
 
 * {
@@ -28,58 +20,150 @@
 }
 
 body {
-  margin: 0;
   background-color: var(--bg-color);
   color: var(--text-main);
   overflow-x: hidden;
 }
 
-#root {
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: row;
+}
+
+/* SIDEBAR - Mode Bureau */
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  background: white;
+  z-index: 100;
+}
+
+.sidebar-logo {
   width: 100%;
 }
 
-h1, h2, h3, h4 {
+.sidebar-logo img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.sidebar-nav {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: var(--text-main);
+  font-weight: 800;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* CONTENU - Mode Bureau */
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  padding: 4rem;
+  background-color: var(--bg-main);
+  min-height: 100vh;
+}
+
+/* RESPONSIVE - Tablette et Mobile */
+@media (max-width: 1024px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .sidebar-logo {
+    width: 100px; /* Taille adaptée pour mobile */
+    margin: 0; /* Pas de marge, calé à gauche */
+  }
+
+  .sidebar-nav {
+    flex-direction: row;
+    padding: 1rem 1.5rem;
+    overflow-x: auto;
+    gap: 2rem;
+    align-items: center;
+    border-top: 1px solid var(--border-color); /* Séparation légère */
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* Grilles de produits */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2.5rem;
+}
+
+@media (max-width: 480px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.image-container {
+  width: 100%;
+  aspect-ratio: 1;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #eee;
+  padding: 1rem;
+}
+
+.image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: #000; /* Noir profond */
+  color: #fff; /* Texte blanc */
+  text-decoration: none;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: -0.01em;
-  line-height: 1.1;
-}
-
-.mono {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-}
-
-button {
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  padding: 1rem 2rem;
+  border: none;
   cursor: pointer;
-  border: 2px solid var(--border-color);
-  background: var(--bg-color);
-  font-family: inherit;
-  font-weight: 700;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  text-transform: uppercase;
+  transition: all 0.2s ease;
 }
 
-button:hover {
-  background: var(--text-main);
-  color: var(--bg-color);
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--border-color);
-}
-
-.card {
-  border: 2px solid var(--border-color);
-  background: var(--bg-color);
-  padding: 1.5rem;
-  transition: transform 0.2s;
-}
-
-.card:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 8px 8px 0 var(--border-color);
-}
-
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 2rem;
+.btn-cta:hover {
+  background-color: var(--primary-color);
+  gap: 16px;
 }
