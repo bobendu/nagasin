@@ -55,7 +55,7 @@ function App() {
       </motion.div>
       
       <div style={{ marginTop: '2rem', fontSize: '0.7rem', color: '#ccc', textTransform: 'uppercase', letterSpacing: '2px' }}>
-        v1.0.1 • © 2026 NA! STUDIO • NAGASIN.FR
+        v1.0.2 • © 2026 NA! STUDIO • NAGASIN.FR
       </div>
     </div>
   )
