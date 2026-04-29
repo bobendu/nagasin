@@ -31,5 +31,5 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 22
           local_path: './dist/*'
-          remote_path: '/home/nagasinffe/www'
+          remote_path: 'www'
           sftp_only: true
