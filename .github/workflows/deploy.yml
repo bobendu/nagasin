@@ -3,7 +3,7 @@ name: Deploy to OVH
 on:
   push:
     branches:
-      - master  # Ou 'main' selon votre branche par défaut
+      - master
 
 jobs:
   build-and-deploy:
@@ -24,12 +24,12 @@ jobs:
         run: npm run build
 
       - name: Deploy to OVH via SFTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
+          server: ${{ secrets.FTP_SERVER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/
-          server-dir: ./www/
-          protocol: sftp
           port: 22
+          local_path: './dist/*'
+          remote_path: '/home/nagasinffe/www'
+          sftp_only: true
