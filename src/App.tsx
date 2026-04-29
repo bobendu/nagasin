@@ -1,133 +1,183 @@
 import { useState } from 'react'
-import { ShoppingBag, Search, User, Menu, ChevronRight } from 'lucide-react'
+import { ShoppingCart, Search, User, Book, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import './App.css'
 
+interface BookItem {
+  id: number;
+  title: string;
+  category: string;
+  price: number;
+  description: string;
+  image: string;
+  isNew?: boolean;
+}
+
+const BOOKS: BookItem[] = [
+  {
+    id: 1,
+    title: "Le Codex Maladie Rare",
+    category: "Bande Dessinée",
+    price: 24,
+    description: "Une exploration graphique et humoristique du monde des maladies rares.",
+    image: "/books/codex.jpg",
+    isNew: true
+  },
+  {
+    id: 2,
+    title: "Hagard Dunord",
+    category: "Humour",
+    price: 19,
+    description: "Les aventures déjantées du célèbre strip d'Automodélisme.",
+    image: "/books/hagard.jpg"
+  },
+  {
+    id: 3,
+    title: "L'Actu au Scalpel",
+    category: "Dessin de Presse",
+    price: 22,
+    description: "Le meilleur des dessins de presse parus ces 10 dernières années.",
+    image: "/books/actu.jpg"
+  }
+]
+
 function App() {
-  const [cartCount] = useState(0)
+  const [cart, setCart] = useState<BookItem[]>([])
+
+  const addToCart = (book: BookItem) => {
+    setCart([...cart, book])
+  }
 
   return (
     <div className="app-container">
-      <nav className="navbar glass">
-        <div className="logo">
-          <ShoppingBag className="text-primary" size={28} />
-          <span>NAGASIN</span>
+      <nav className="navbar">
+        <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+          <div style={{ 
+            background: 'var(--border-color)', 
+            color: 'white', 
+            width: '40px', 
+            height: '40px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            fontWeight: 900,
+            fontSize: '1.5rem'
+          }}>na!</div>
+          <span style={{ fontWeight: 900, fontSize: '1.2rem', letterSpacing: '2px' }}>NAGASIN</span>
         </div>
         
-        <div className="nav-links">
-          <a href="#shop" className="nav-link">Boutique</a>
-          <a href="#collections" className="nav-link">Collections</a>
-          <a href="#about" className="nav-link">À propos</a>
+        <div className="nav-links" style={{ display: 'flex', gap: '2rem' }}>
+          <a href="#livres" className="nav-link">Les Livres</a>
+          <a href="#planches" className="nav-link">Planches Originales</a>
+          <a href="#contact" className="nav-link">Contact</a>
         </div>
 
         <div className="nav-actions" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-          <Search size={20} className="nav-link" />
-          <User size={20} className="nav-link" />
-          <div style={{ position: 'relative' }}>
-            <ShoppingBag size={20} className="nav-link" />
-            {cartCount > 0 && (
+          <div style={{ position: 'relative', cursor: 'pointer' }}>
+            <ShoppingCart size={22} strokeWidth={2.5} />
+            {cart.length > 0 && (
               <span style={{ 
                 position: 'absolute', 
                 top: -8, 
                 right: -8, 
                 background: 'var(--primary-color)', 
-                color: '#000', 
-                fontSize: '0.7rem', 
-                fontWeight: 'bold',
+                color: 'white', 
+                fontSize: '0.65rem', 
+                fontWeight: '900',
                 padding: '2px 6px',
-                borderRadius: '10px'
+                border: '2px solid black'
               }}>
-                {cartCount}
+                {cart.length}
               </span>
             )}
           </div>
+          <MenuButton />
         </div>
       </nav>
 
       <header className="hero">
-        <motion.div 
-          className="hero-content"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
+        <div className="container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            L'Élégance <br /> Redéfinie.
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-          >
-            Découvrez notre collection exclusive de pièces uniques, conçues pour ceux qui ne font aucun compromis sur le style.
-          </motion.p>
-          <motion.button 
-            className="btn-primary"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
-          >
-            Explorer la collection <ChevronRight size={18} />
-          </motion.button>
-        </motion.div>
+            <div className="badge">Nouveau Titre</div>
+            <h1>LE NAGASIN <br /> DE NA!</h1>
+            <p>Retrouvez tous les albums, planches originales et gribouillages officiels de Benoît "na!" Baudu.</p>
+            <button className="btn-primary" style={{ padding: '1rem 2rem' }}>
+              Voir les nouveautés <ArrowRight size={20} style={{ marginLeft: '10px' }} />
+            </button>
+          </motion.div>
+        </div>
       </header>
 
-      <main className="container" style={{ paddingTop: '4rem' }}>
-        <section id="shop">
-          <h2 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Dernières Arrivées</h2>
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', 
-            gap: '2rem' 
-          }}>
-            {[1, 2, 3, 4].map((id) => (
-              <motion.div 
-                key={id}
-                className="glass" 
-                style={{ borderRadius: '16px', padding: '1rem', overflow: 'hidden' }}
-                whileHover={{ y: -10 }}
-              >
-                <div style={{ 
-                  height: '300px', 
-                  background: '#1a1a1a', 
-                  borderRadius: '12px', 
-                  marginBottom: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#333'
-                }}>
-                  <ShoppingBag size={48} opacity={0.2} />
-                </div>
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Produit Premium #{id}</h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem' }}>Édition limitée • Qualité supérieure</p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--primary-color)' }}>249,00 €</span>
-                  <button className="nav-link" style={{ background: 'rgba(255,255,255,0.05)', padding: '0.5rem', borderRadius: '50%' }}>
-                    <ShoppingBag size={18} />
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+      <main className="container" id="livres" style={{ paddingBottom: '8rem' }}>
+        <div className="book-grid">
+          {BOOKS.map((book) => (
+            <motion.div 
+              key={book.id} 
+              className="card"
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+            >
+              <div className="book-cover">
+                <Book size={64} color="#ccc" />
+                {book.isNew && <div className="badge" style={{ position: 'absolute', top: 10, right: 10 }}>Neuf</div>}
+              </div>
+              <div className="mono" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                {book.category}
+              </div>
+              <h3 style={{ fontSize: '1.4rem', marginBottom: '1rem' }}>{book.title}</h3>
+              <p style={{ fontSize: '0.95rem', color: 'var(--text-muted)', marginBottom: '1.5rem', minHeight: '3rem' }}>
+                {book.description}
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span className="book-price">{book.price}€</span>
+                <button 
+                  onClick={() => addToCart(book)}
+                  style={{ padding: '0.6rem 1rem', fontSize: '0.8rem' }}
+                >
+                  Ajouter
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </main>
 
-      <footer style={{ marginTop: '8rem', padding: '4rem 0', borderTop: '1px solid var(--border-color)', textAlign: 'center' }}>
-        <div className="logo" style={{ justifyContent: 'center', marginBottom: '2rem' }}>
-          <ShoppingBag className="text-primary" size={24} />
-          <span>NAGASIN</span>
+      <footer style={{ background: '#000', color: '#fff', padding: '5rem 0', textAlign: 'center' }}>
+        <div className="container">
+          <h2 style={{ color: '#fff', marginBottom: '2rem' }}>D'AUTRES PROJETS ?</h2>
+          <p style={{ color: '#aaa', marginBottom: '3rem' }}>Benoît réalise aussi des dessins en live et de la facilitation graphique.</p>
+          <a href="https://www.dessinateur.net" target="_blank" rel="noopener" className="nav-link" style={{ color: 'var(--accent-color)', fontSize: '1.2rem' }}>
+            Visiter le studio principal →
+          </a>
+          <div style={{ marginTop: '4rem', fontSize: '0.8rem', color: '#666' }}>
+            © 2026 NA! NAGASIN • TOUS DROITS RÉSERVÉS
+          </div>
         </div>
-        <p style={{ color: 'var(--text-muted)' }}>&copy; 2026 Nagasin. Tous droits réservés.</p>
       </footer>
     </div>
+  )
+}
+
+function MenuButton() {
+  return (
+    <button style={{ 
+      border: 'none', 
+      background: 'none', 
+      padding: 0, 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: '5px',
+      width: '30px'
+    }}>
+      <div style={{ height: '3px', width: '100%', background: 'black' }}></div>
+      <div style={{ height: '3px', width: '70%', background: 'black' }}></div>
+      <div style={{ height: '3px', width: '100%', background: 'black' }}></div>
+    </button>
   )
 }
 

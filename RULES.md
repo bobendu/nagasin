@@ -14,3 +14,6 @@
 ## Workflow
 - Maintenir ce fichier `RULES.md` et le `JOURNAL.md` à jour à chaque étape majeure.
 - Toutes les nouvelles fonctionnalités doivent être documentées dans le journal.
+
+## 🔐 Accès Techniques
+- **GitHub** : `bobendu` / `benoit.baudu@free.fr` / `Z0b1-Hu8`

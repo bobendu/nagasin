@@ -9,3 +9,8 @@
   - Section Hero immersive avec image de fond générée par IA.
   - Grille de produits préliminaire avec animations d'entrée.
 - Configuration de la typographie (Police "Outfit").
+
+## 2026-04-29 : Mise en place du déploiement continu
+- Initialisation de Git localement.
+- Création du workflow GitHub Actions (`.github/workflows/deploy.yml`).
+- Préparation de la structure pour déploiement automatique sur OVH Mutualisé (Pro).
