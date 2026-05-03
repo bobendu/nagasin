@@ -172,6 +172,8 @@ export default function CustomPrintCard({ onAddToCart }: CustomPrintCardProps) {
             </p>
           </div>
 
+          {/* APERÇU IMAGE SÉLECTIONNÉE */}
+          {selectedImage && (
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
