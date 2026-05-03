@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import StoreApp from './StoreApp'
-import AdminApp from './AdminApp'
 import { motion } from 'framer-motion'
 import { Lock, Edit3 } from 'lucide-react'
 
@@ -20,7 +19,7 @@ function App() {
     e.preventDefault()
     if (user.toLowerCase() === 'na' && password === 'nagasin2026') {
       setIsLoggedIn(true)
-      setView('admin')
+      setView('store')
     } else {
       alert("Accès refusé.")
     }
@@ -71,11 +70,6 @@ function App() {
         </form>
       </div>
     )
-  }
-
-  // --- ADMIN DASHBOARD ---
-  if (view === 'admin') {
-    return <AdminApp onBack={() => setView('store')} />
   }
 
   // --- STORE FRONT ---
