@@ -28,7 +28,15 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   const [cartStep, setCartStep] = useState<'cart' | 'checkout' | 'payment' | 'success'>('cart')
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false)
   const [justAdded, setJustAdded] = useState<number | null>(null)
-  const [customerInfo, setCustomerInfo] = useState({ name: '', email: '', addr: '' })
+  const [customerInfo, setCustomerInfo] = useState({ 
+    firstName: '', 
+    lastName: '', 
+    email: '', 
+    emailConfirm: '',
+    address: '', 
+    zipCode: '', 
+    city: '' 
+  })
 
   useEffect(() => {
     // Si Admin, on charge le brouillon local s'il existe
@@ -153,7 +161,11 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     const order = {
       id: Date.now(),
       date: new Date().toISOString(),
-      customer: customerInfo,
+      customer: {
+        name: `${customerInfo.firstName} ${customerInfo.lastName}`,
+        email: customerInfo.email,
+        addr: `${customerInfo.address}, ${customerInfo.zipCode} ${customerInfo.city}`
+      },
       items: cart,
       total,
       status: 'Payée',
@@ -342,28 +354,59 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
                     )}
 
                     {cartStep === 'checkout' && (
-                      /* ÉTAPE 2 : FORMULAIRE CLIENT */
+                      /* ÉTAPE 2 : FORMULAIRE CLIENT DÉTAILLÉ */
                       <div style={{ marginTop: '1rem', padding: '1.5rem', background: '#f9f9f9', borderRadius: '12px' }}>
                         <h4 style={{ fontSize: '0.8rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '1px' }}>INFOS DE LIVRAISON</h4>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                          <input 
-                            type="text" placeholder="Nom Complet" 
-                            value={customerInfo.name}
-                            onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
-                            style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
-                          />
+                          <div style={{ display: 'flex', gap: '1rem' }}>
+                            <input 
+                              type="text" placeholder="Prénom" 
+                              value={customerInfo.firstName}
+                              onChange={(e) => setCustomerInfo({...customerInfo, firstName: e.target.value})}
+                              style={{ flex: 1, padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
+                            />
+                            <input 
+                              type="text" placeholder="Nom" 
+                              value={customerInfo.lastName}
+                              onChange={(e) => setCustomerInfo({...customerInfo, lastName: e.target.value})}
+                              style={{ flex: 1, padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
+                            />
+                          </div>
+
                           <input 
                             type="email" placeholder="Email" 
                             value={customerInfo.email}
                             onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
                             style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
                           />
-                          <textarea 
-                            placeholder="Adresse de livraison complète" 
-                            value={customerInfo.addr}
-                            onChange={(e) => setCustomerInfo({...customerInfo, addr: e.target.value})}
-                            style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem', resize: 'none' }} rows={3} 
+                          <input 
+                            type="email" placeholder="Confirmez votre Email" 
+                            value={customerInfo.emailConfirm}
+                            onChange={(e) => setCustomerInfo({...customerInfo, emailConfirm: e.target.value})}
+                            style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
                           />
+
+                          <input 
+                            type="text" placeholder="N° et Nom de rue" 
+                            value={customerInfo.address}
+                            onChange={(e) => setCustomerInfo({...customerInfo, address: e.target.value})}
+                            style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
+                          />
+
+                          <div style={{ display: 'flex', gap: '1rem' }}>
+                            <input 
+                              type="text" placeholder="Code Postal" 
+                              value={customerInfo.zipCode}
+                              onChange={(e) => setCustomerInfo({...customerInfo, zipCode: e.target.value})}
+                              style={{ width: '120px', padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
+                            />
+                            <input 
+                              type="text" placeholder="Ville" 
+                              value={customerInfo.city}
+                              onChange={(e) => setCustomerInfo({...customerInfo, city: e.target.value})}
+                              style={{ flex: 1, padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
+                            />
+                          </div>
                         </div>
                       </div>
                     )}
@@ -447,21 +490,23 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
                       </div>
                       <button 
                         onClick={() => {
-                          const sanitizedName = sanitizeString(customerInfo.name);
-                          const sanitizedEmail = customerInfo.email.trim();
-                          const sanitizedAddr = sanitizeString(customerInfo.addr);
+                          const { firstName, lastName, email, emailConfirm, address, zipCode, city } = customerInfo;
 
-                          if (!sanitizedName || !sanitizedEmail || !sanitizedAddr) {
+                          if (!firstName || !lastName || !email || !address || !zipCode || !city) {
                             alert("Merci de remplir toutes les informations de livraison.");
                             return;
                           }
 
-                          if (!validateEmail(sanitizedEmail)) {
+                          if (!validateEmail(email)) {
                             alert("Format d'email invalide.");
                             return;
                           }
 
-                          setCustomerInfo({ name: sanitizedName, email: sanitizedEmail, addr: sanitizedAddr });
+                          if (email !== emailConfirm) {
+                            alert("Les adresses email ne correspondent pas.");
+                            return;
+                          }
+
                           setCartStep('payment');
                         }}
                         style={{ 
