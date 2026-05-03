@@ -4,12 +4,14 @@ export default function AdminToolbar({
   onOpenDashboard, 
   onAddProduct, 
   onPublish, 
-  hasChanges 
+  hasChanges,
+  onLogout
 }: { 
   onOpenDashboard: () => void, 
   onAddProduct: () => void,
   onPublish: () => void,
-  hasChanges: boolean
+  hasChanges: boolean,
+  onLogout?: () => void
 }) {
   const logoBlue = '#004169'
 
