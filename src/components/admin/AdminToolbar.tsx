@@ -1,7 +1,7 @@
 import { LayoutDashboard, Lock, Settings, PlusCircle } from 'lucide-react'
 
 export default function AdminToolbar({ onOpenDashboard, onAddProduct }: { onOpenDashboard: () => void, onAddProduct: () => void }) {
-  const logoBlue = '#004369'
+  const logoBlue = '#004169'
 
   return (
     <div style={{

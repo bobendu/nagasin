@@ -16,15 +16,18 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
   const [iframeKey, setIframeKey] = useState(0)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
-  // États pour le titre et le prix éditables
+  // États pour le titre, le prix et le descriptif éditables
   const [customTitle, setCustomTitle] = useState('Tirage sous cadre')
   const [customPrice, setCustomPrice] = useState(45)
+  const [customDesc, setCustomDesc] = useState("Choisissez votre illustration préférée sur le blog (scrollez et cliquez) ou par mot clé ; je vous l'imprime, vous la mets sous cadre et je vous l'expédie.")
 
   useEffect(() => {
     const savedTitle = localStorage.getItem('nagasin_custom_print_title')
     const savedPrice = localStorage.getItem('nagasin_custom_print_price')
+    const savedDesc = localStorage.getItem('nagasin_custom_print_desc')
     if (savedTitle) setCustomTitle(savedTitle)
     if (savedPrice) setCustomPrice(parseFloat(savedPrice))
+    if (savedDesc) setCustomDesc(savedDesc)
   }, [])
 
   const updateTitle = (val: string) => {
@@ -35,6 +38,11 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
   const updatePrice = (val: number) => {
     setCustomPrice(val)
     localStorage.setItem('nagasin_custom_print_price', val.toString())
+  }
+
+  const updateDesc = (val: string) => {
+    setCustomDesc(val)
+    localStorage.setItem('nagasin_custom_print_desc', val)
   }
   
   // Écouteur de messages sécurisé venant du blog
@@ -172,7 +180,7 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
                 value={customTitle} 
                 onChange={(e) => updateTitle(e.target.value)}
                 style={{ 
-                  fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004369', 
+                  fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', 
                   outline: 'none', background: 'transparent', width: '100%', marginBottom: '0.8rem' 
                 }}
               />
@@ -200,9 +208,21 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
               />
             </div>
 
-            <p style={{ fontSize: '0.8rem', color: '#666', lineHeight: 1.5, margin: 0 }}>
-              Choisissez votre illustration préférée sur le blog (scrollez et cliquez) ou par mot clé ; je vous l'imprime, vous la mets sous cadre et je vous l'expédie.
-            </p>
+            {isAdmin ? (
+              <textarea 
+                value={customDesc} 
+                onChange={(e) => updateDesc(e.target.value)}
+                style={{ 
+                  fontSize: '0.8rem', color: '#666', lineHeight: 1.5, margin: 0,
+                  width: '100%', border: 'none', borderBottom: '1px dashed #004169', 
+                  outline: 'none', background: 'transparent', resize: 'none', minHeight: '60px'
+                }}
+              />
+            ) : (
+              <p style={{ fontSize: '0.8rem', color: '#666', lineHeight: 1.5, margin: 0 }}>
+                {customDesc}
+              </p>
+            )}
           </div>
 
           {/* APERÇU IMAGE SÉLECTIONNÉE */}
@@ -256,7 +276,7 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
                   value={customPrice} 
                   onChange={(e) => updatePrice(parseFloat(e.target.value))}
                   style={{ 
-                    fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004369', 
+                    fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', 
                     outline: 'none', background: 'transparent', width: '80px' 
                   }}
                 />

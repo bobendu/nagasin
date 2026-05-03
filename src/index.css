@@ -6,7 +6,7 @@
   color-scheme: light;
   --bg-color: #ffffff;
   --bg-main: #e1f0ff; 
-  --primary-color: #004369;
+  --primary-color: #004169;
   --text-main: #000000;
   --text-muted: #666666;
   --border-color: #f2f2f2;
@@ -227,7 +227,7 @@ body {
 .maintenance-divider {
   margin-top: 3rem;
   height: 2px;
-  background: #004369;
+  background: #004169;
   width: 60px;
 }
 

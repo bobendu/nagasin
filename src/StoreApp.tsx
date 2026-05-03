@@ -296,7 +296,7 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
           bottom: 0, 
           left: 0, 
           right: 0, 
-          background: '#004369', 
+          background: '#004169', 
           color: 'white', 
           padding: '1rem 2rem', 
           display: 'flex', 

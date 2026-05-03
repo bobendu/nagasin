@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { ArrowRight, PenLine, Trash2, Camera, Save, X } from 'lucide-react'
+import { ArrowRight, Trash2, Camera } from 'lucide-react'
 import type { Product } from '../../data/products'
 
 interface EditableProductCardProps {
@@ -11,21 +10,8 @@ interface EditableProductCardProps {
 }
 
 export default function EditableProductCard({ product, isAdmin, onAddToCart, onUpdate, onDelete }: EditableProductCardProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [localProduct, setLocalProduct] = useState(product)
-
   const handleChange = (field: keyof Product, value: any) => {
-    setLocalProduct(prev => ({ ...prev, [field]: value }))
-  }
-
-  const handleSave = () => {
-    onUpdate(product.id, localProduct)
-    setIsEditing(false)
-  }
-
-  const handleCancel = () => {
-    setLocalProduct(product)
-    setIsEditing(false)
+    onUpdate(product.id, { [field]: value })
   }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,40 +28,33 @@ export default function EditableProductCard({ product, isAdmin, onAddToCart, onU
     <div className="item-card-clean" style={{ 
       paddingBottom: '3rem', 
       position: 'relative',
-      background: isEditing ? '#fff' : 'transparent',
-      borderRadius: isEditing ? '16px' : '0',
-      padding: isEditing ? '1rem' : '0',
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      border: isAdmin ? '1px dashed #004169' : 'none',
+      padding: isAdmin ? '1rem' : '0'
     }}>
-      {/* ADMIN CONTROLS OVERLAY */}
-      {isAdmin && !isEditing && (
-        <div style={{ 
-          position: 'absolute', top: '-10px', right: '-10px', display: 'flex', gap: '8px', zIndex: 10 
-        }}>
-          <button 
-            onClick={() => setIsEditing(true)}
-            style={{ background: '#000', color: '#fff', border: 'none', padding: '8px', borderRadius: '50%', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}
-          >
-            <PenLine size={14} />
-          </button>
-          <button 
-            onClick={() => onDelete(product.id)}
-            style={{ background: '#ff4444', color: '#fff', border: 'none', padding: '8px', borderRadius: '50%', cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
+      {/* DELETE BUTTON (ADMIN ONLY) */}
+      {isAdmin && (
+        <button 
+          onClick={() => onDelete(product.id)}
+          style={{ 
+            position: 'absolute', top: '-10px', right: '-10px', background: '#ff4444', 
+            color: '#fff', border: 'none', padding: '8px', borderRadius: '50%', 
+            cursor: 'pointer', boxShadow: '0 4px 10px rgba(0,0,0,0.2)', zIndex: 20 
+          }}
+        >
+          <Trash2 size={14} />
+        </button>
       )}
 
       {/* IMAGE SECTION */}
       <div className="image-container" style={{ position: 'relative' }}>
-        <img src={localProduct.image} alt={localProduct.title} />
-        {isEditing && (
+        <img src={product.image} alt={product.title} />
+        {isAdmin && (
           <label style={{ 
             position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', 
             display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'white',
-            flexDirection: 'column', gap: '10px'
-          }}>
+            flexDirection: 'column', gap: '10px', opacity: 0, transition: 'opacity 0.2s'
+          }} className="hover-overlay">
             <Camera size={32} />
             <span style={{ fontSize: '0.7rem', fontWeight: 900 }}>CHANGER L'IMAGE</span>
             <input type="file" style={{ display: 'none' }} onChange={handleImageChange} />
@@ -85,50 +64,45 @@ export default function EditableProductCard({ product, isAdmin, onAddToCart, onU
 
       {/* TEXT CONTENT */}
       <div style={{ marginTop: '1.5rem' }}>
-        {isEditing ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {isAdmin ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             <input 
-              value={localProduct.title} 
+              value={product.title} 
               onChange={e => handleChange('title', e.target.value)}
               placeholder="Titre du produit"
-              style={{ fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #00e5ff', outline: 'none', width: '100%' }}
+              style={{ fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', outline: 'none', width: '100%', background: 'transparent' }}
             />
             <textarea 
-              value={localProduct.description} 
+              value={product.description} 
               onChange={e => handleChange('description', e.target.value)}
               placeholder="Description courte"
               rows={2}
-              style={{ fontSize: '0.9rem', color: '#666', border: 'none', borderBottom: '1px solid #eee', outline: 'none', width: '100%', resize: 'none' }}
+              style={{ fontSize: '0.9rem', color: '#666', border: 'none', borderBottom: '1px solid #eee', outline: 'none', width: '100%', resize: 'none', background: 'transparent' }}
             />
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
               <div style={{ flex: 1 }}>
                 <label style={{ fontSize: '0.6rem', fontWeight: 900, color: '#999' }}>PRIX (€)</label>
                 <input 
                   type="number"
-                  value={localProduct.price} 
+                  value={product.price} 
                   onChange={e => handleChange('price', parseFloat(e.target.value))}
-                  style={{ fontSize: '1.1rem', fontWeight: 800, border: 'none', borderBottom: '1px solid #eee', outline: 'none', width: '100%' }}
+                  style={{ fontSize: '1.1rem', fontWeight: 800, border: 'none', borderBottom: '1px solid #eee', outline: 'none', width: '100%', background: 'transparent' }}
                 />
               </div>
               <div style={{ flex: 1 }}>
                 <label style={{ fontSize: '0.6rem', fontWeight: 900, color: '#999' }}>STOCK</label>
                 <input 
                   type="number"
-                  value={localProduct.stock} 
+                  value={product.stock} 
                   onChange={e => handleChange('stock', parseInt(e.target.value))}
-                  style={{ fontSize: '1.1rem', fontWeight: 800, border: 'none', borderBottom: '1px solid #eee', outline: 'none', width: '100%' }}
+                  style={{ fontSize: '1.1rem', fontWeight: 800, border: 'none', borderBottom: '1px solid #eee', outline: 'none', width: '100%', background: 'transparent' }}
                 />
               </div>
             </div>
             
-            <div style={{ display: 'flex', gap: '10px', marginTop: '1rem' }}>
-              <button onClick={handleSave} style={{ flex: 1, background: '#000', color: '#fff', border: 'none', padding: '10px', fontWeight: 800, borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <Save size={14} /> VALIDER
-              </button>
-              <button onClick={handleCancel} style={{ background: '#eee', border: 'none', padding: '10px', borderRadius: '4px', cursor: 'pointer' }}>
-                <X size={14} />
-              </button>
-            </div>
+            <button className="btn-cta" style={{ marginTop: '1rem', opacity: 0.5, pointerEvents: 'none' }}>
+              MODE ÉDITION ACTIF
+            </button>
           </div>
         ) : (
           <>
@@ -148,6 +122,12 @@ export default function EditableProductCard({ product, isAdmin, onAddToCart, onU
           </>
         )}
       </div>
+
+      <style>{`
+        .image-container:hover .hover-overlay {
+          opacity: 1 !important;
+        }
+      `}</style>
     </div>
   )
 }
