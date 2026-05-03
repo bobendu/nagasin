@@ -87,3 +87,21 @@
     - Isolation des données dans un dossier protégé par `.htaccess`.
     - Authentification croisée entre le frontend et le backend PHP via le token admin.
 - **Hybride Dev/Prod** : Implémentation d'un système de "Fallback" intelligent permettant de continuer le développement en local (localStorage) tout en utilisant l'API réelle en production.
+
+## 2026-05-03 : Version 0.4.1 - Synchronisation Multi-Appareils
+- **Catalogue Serveur** : Migration du catalogue de produits vers le serveur PHP.
+- **Sync PC/iPad** : Les modifications publiées sur un appareil sont désormais instantanément visibles sur tous les autres (suppression de la dépendance au localStorage pour les données publiques).
+
+## 2026-05-03 : Version 0.5.0 - Cycle de Vie & Notifications
+- **Formulaire Client Expert** : 
+    - Champs granulaires (Prénom, Nom, Rue, CP, Ville).
+    - Double validation d'email pour éviter les erreurs de saisie.
+    - Sanitization systématique de toutes les entrées client.
+- **Gestion des Frais de Port** :
+    - Ajout d'un panneau de réglages admin pour définir les frais d'envoi.
+    - Calcul dynamique du total (Sous-total + Frais de port) dans le panier.
+- **Suivi de Commande & Emails** :
+    - Système de statuts interactifs : **Payée** ➔ **En préparation** ➔ **Expédiée**.
+    - Notifications emails automatiques envoyées via le serveur OVH à chaque changement de statut.
+    - Modale de confirmation sécurisée avant chaque changement de statut pour éviter les erreurs.
+- **Optimisation Délivrabilité** : Configuration des en-têtes PHP Mail pour maximiser la réception (Expéditeur local, Return-Path, Reply-To).
