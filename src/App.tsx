@@ -80,7 +80,7 @@ function App() {
   }
 
   // --- STORE FRONT ---
-  return <StoreApp isAdmin={isLoggedIn} onEdit={() => setView('admin')} />
+  return <StoreApp isAdmin={isLoggedIn} />
 }
 
 export default App
