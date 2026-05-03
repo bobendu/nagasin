@@ -85,7 +85,7 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
   }
 
   return (
-    <div className="app-layout">
+    <div className="app-layout" style={{ paddingTop: isAdmin ? '80px' : 0 }}>
       {isAdmin && (
         <AdminToolbar 
           onOpenDashboard={() => setIsAdminDashboardOpen(true)} 
@@ -99,13 +99,15 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
       />
 
       {/* SIDEBAR MINIMALISTE */}
-      <aside className="sidebar">
-        <div className="sidebar-logo">
-          <img 
-            src="https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg" 
-            alt="na!" 
-          />
-        </div>
+      <aside className="sidebar" style={{ top: isAdmin ? '80px' : 0, height: isAdmin ? 'calc(100vh - 80px)' : '100vh' }}>
+        {!isAdmin && (
+          <div className="sidebar-logo">
+            <img 
+              src="https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg" 
+              alt="na!" 
+            />
+          </div>
+        )}
         
         <nav className="sidebar-nav" style={{ padding: '2rem 1.5rem' }}>
           <button 

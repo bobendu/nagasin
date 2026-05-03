@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Lock, Edit3 } from 'lucide-react'
 
 function App() {
-  const [view, setView] = useState<'maintenance' | 'login' | 'admin' | 'store'>('store')
+  const [view, setView] = useState<'maintenance' | 'login' | 'admin' | 'store'>('maintenance')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [password, setPassword] = useState('')
   const [user, setUser] = useState('')
