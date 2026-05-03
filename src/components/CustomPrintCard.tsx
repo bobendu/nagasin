@@ -4,9 +4,10 @@ import { ExternalLink, ShoppingCart, Globe, RotateCcw, Home, ChevronLeft, Search
 
 interface CustomPrintCardProps {
   onAddToCart: (item: any) => void;
+  isAdmin?: boolean;
 }
 
-export default function CustomPrintCard({ onAddToCart }: CustomPrintCardProps) {
+export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCardProps) {
   const initialUrl = 'https://www.dessinateur.biz/blog/'
   const [url, setUrl] = useState(initialUrl)
   const [description, setDescription] = useState('')
@@ -14,6 +15,27 @@ export default function CustomPrintCard({ onAddToCart }: CustomPrintCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [iframeKey, setIframeKey] = useState(0)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+
+  // États pour le titre et le prix éditables
+  const [customTitle, setCustomTitle] = useState('Tirage sous cadre')
+  const [customPrice, setCustomPrice] = useState(45)
+
+  useEffect(() => {
+    const savedTitle = localStorage.getItem('nagasin_custom_print_title')
+    const savedPrice = localStorage.getItem('nagasin_custom_print_price')
+    if (savedTitle) setCustomTitle(savedTitle)
+    if (savedPrice) setCustomPrice(parseFloat(savedPrice))
+  }, [])
+
+  const updateTitle = (val: string) => {
+    setCustomTitle(val)
+    localStorage.setItem('nagasin_custom_print_title', val)
+  }
+
+  const updatePrice = (val: number) => {
+    setCustomPrice(val)
+    localStorage.setItem('nagasin_custom_print_price', val.toString())
+  }
   
   // Écouteur de messages sécurisé venant du blog
   useEffect(() => {
@@ -35,8 +57,8 @@ export default function CustomPrintCard({ onAddToCart }: CustomPrintCardProps) {
   const handleOrder = () => {
     onAddToCart({
       id: Date.now(),
-      title: "Tirage d'art personnalisé",
-      price: 45,
+      title: customTitle,
+      price: customPrice,
       image: selectedImage || "https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg",
       description: `Tirage du dessin : ${description}`,
       dedication: dedication,
@@ -145,7 +167,18 @@ export default function CustomPrintCard({ onAddToCart }: CustomPrintCardProps) {
         {/* CONTROLES */}
         <div style={{ flex: 1.2, padding: '1.2rem', display: 'flex', flexDirection: 'column', gap: '1rem', background: '#fcfcfc', overflow: 'hidden' }}>
           <div>
-            <h2 style={{ fontSize: '1.5rem', margin: '0 0 0.8rem', lineHeight: 1.1, fontWeight: 900 }}>Tirage sous cadre</h2>
+            {isAdmin ? (
+              <input 
+                value={customTitle} 
+                onChange={(e) => updateTitle(e.target.value)}
+                style={{ 
+                  fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004369', 
+                  outline: 'none', background: 'transparent', width: '100%', marginBottom: '0.8rem' 
+                }}
+              />
+            ) : (
+              <h2 style={{ fontSize: '1.5rem', margin: '0 0 0.8rem', lineHeight: 1.1, fontWeight: 900 }}>{customTitle}</h2>
+            )}
             
             {/* RECHERCHE DYNAMIQUE DÉPLACÉE ICI */}
             <div style={{ 
@@ -216,7 +249,22 @@ export default function CustomPrintCard({ onAddToCart }: CustomPrintCardProps) {
           </div>
 
           <div style={{ marginTop: 'auto' }}>
-            <span style={{ fontSize: '1.5rem', fontWeight: 900, display: 'block', marginBottom: '0.8rem' }}>45.00 €</span>
+            {isAdmin ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '0.8rem' }}>
+                <input 
+                  type="number"
+                  value={customPrice} 
+                  onChange={(e) => updatePrice(parseFloat(e.target.value))}
+                  style={{ 
+                    fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004369', 
+                    outline: 'none', background: 'transparent', width: '80px' 
+                  }}
+                />
+                <span style={{ fontWeight: 900, fontSize: '1.4rem' }}>€</span>
+              </div>
+            ) : (
+              <span style={{ fontSize: '1.5rem', fontWeight: 900, display: 'block', marginBottom: '0.8rem' }}>{customPrice.toFixed(2)} €</span>
+            )}
             <button 
               className="btn-cta" 
               onClick={handleOrder}

@@ -162,7 +162,7 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
 
         {/* PRODUIT INTERACTIF (L'INTELLIGENT) */}
         <div style={{ marginTop: '5rem', marginBottom: '5rem' }}>
-          <CustomPrintCard onAddToCart={addToCart} />
+          <CustomPrintCard onAddToCart={addToCart} isAdmin={!!isAdmin} />
         </div>
 
         {/* SECTION CONTACT / INFOS (FIN DE PAGE) */}
