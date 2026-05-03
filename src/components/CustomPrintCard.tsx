@@ -143,14 +143,14 @@ export default function CustomPrintCard({ onAddToCart }: CustomPrintCardProps) {
         </div>
 
         {/* CONTROLES */}
-        <div style={{ flex: 1.2, padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: '#fcfcfc' }}>
+        <div style={{ flex: 1.2, padding: '1.2rem', display: 'flex', flexDirection: 'column', gap: '1rem', background: '#fcfcfc', overflow: 'hidden' }}>
           <div>
-            <h2 style={{ fontSize: '2rem', margin: '0 0 1rem', lineHeight: 1.1, fontWeight: 900 }}>Tirage sous cadre</h2>
+            <h2 style={{ fontSize: '1.5rem', margin: '0 0 0.8rem', lineHeight: 1.1, fontWeight: 900 }}>Tirage sous cadre</h2>
             
             {/* RECHERCHE DYNAMIQUE DÉPLACÉE ICI */}
             <div style={{ 
-              display: 'flex', alignItems: 'center', background: '#fff', borderRadius: '12px', 
-              border: '1px solid #eee', padding: '8px 12px', gap: '10px', marginBottom: '1.5rem',
+              display: 'flex', alignItems: 'center', background: '#fff', borderRadius: '8px', 
+              border: '1px solid #eee', padding: '6px 10px', gap: '8px', marginBottom: '1rem',
               boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
             }}>
               <Search size={16} color="var(--primary-color)" />
@@ -167,22 +167,20 @@ export default function CustomPrintCard({ onAddToCart }: CustomPrintCardProps) {
               />
             </div>
 
-            <p style={{ fontSize: '0.9rem', color: '#666', lineHeight: 1.6 }}>
-              Choisissez votre illustration préférée sur le blog dans la fenêtre ci-contre (scrollez et cliquez) ou par mot clé dans la zone de recherche ci-dessus ; je vous l'imprime, vous la mets sous cadre et je vous l'expédie dans les meilleurs délais (je peux même vous la dédicacer).
+            <p style={{ fontSize: '0.8rem', color: '#666', lineHeight: 1.5, margin: 0 }}>
+              Choisissez votre illustration préférée sur le blog (scrollez et cliquez) ou par mot clé ; je vous l'imprime, vous la mets sous cadre et je vous l'expédie.
             </p>
           </div>
 
-          {/* APERÇU IMAGE SÉLECTIONNÉE */}
-          {selectedImage && (
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               style={{ 
-                background: '#fff', padding: '10px', borderRadius: '12px', border: '2px solid var(--primary-color)',
+                background: '#fff', padding: '8px', borderRadius: '8px', border: '2px solid var(--primary-color)',
                 position: 'relative'
               }}
             >
-              <img src={selectedImage} style={{ width: '100%', height: '150px', objectFit: 'contain' }} />
+              <img src={selectedImage} style={{ width: '100%', height: '100px', objectFit: 'contain' }} />
               
               <button 
                 onClick={() => setSelectedImage(null)}
@@ -205,25 +203,25 @@ export default function CustomPrintCard({ onAddToCart }: CustomPrintCardProps) {
             </motion.div>
           )}
 
-          <div style={{ background: '#fff', padding: '1rem', borderRadius: '12px', border: '1px solid #eee' }}>
-            <label style={{ fontSize: '0.75rem', fontWeight: 900, marginBottom: '8px', display: 'block' }}>DÉDICACE ?</label>
+          <div style={{ background: '#fff', padding: '0.8rem', borderRadius: '8px', border: '1px solid #eee' }}>
+            <label style={{ fontSize: '0.65rem', fontWeight: 900, marginBottom: '5px', display: 'block', color: '#999' }}>DÉDICACE ?</label>
             <textarea 
               placeholder="Texte de la dédicace..."
               value={dedication}
               onChange={(e) => setDedication(e.target.value)}
-              style={{ width: '100%', border: 'none', background: 'transparent', outline: 'none', resize: 'none', minHeight: '60px' }}
+              style={{ width: '100%', border: 'none', background: 'transparent', outline: 'none', resize: 'none', minHeight: '40px', fontSize: '0.8rem' }}
             />
           </div>
 
           <div style={{ marginTop: 'auto' }}>
-            <span style={{ fontSize: '1.8rem', fontWeight: 900, display: 'block', marginBottom: '1rem' }}>45.00 €</span>
+            <span style={{ fontSize: '1.5rem', fontWeight: 900, display: 'block', marginBottom: '0.8rem' }}>45.00 €</span>
             <button 
               className="btn-cta" 
               onClick={handleOrder}
               disabled={!selectedImage && !description}
-              style={{ width: '100%', borderRadius: '12px', opacity: (selectedImage || description) ? 1 : 0.5 }}
+              style={{ width: '100%', borderRadius: '8px', padding: '0.8rem', fontSize: '0.8rem', opacity: (selectedImage || description) ? 1 : 0.5 }}
             >
-              AJOUTER AU PANIER <ShoppingCart size={20} />
+              AJOUTER AU PANIER <ShoppingCart size={18} />
             </button>
           </div>
         </div>
