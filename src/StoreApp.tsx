@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ShoppingCart, X, Trash2, ShoppingBag, PenLine, CreditCard, CheckCircle, Package } from 'lucide-react'
+import { ShoppingCart, X, Trash2, ShoppingBag, PenLine, CreditCard, CheckCircle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
@@ -454,22 +454,23 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
 
               {cart.length > 0 && cartStep !== 'success' && (
                 <div style={{ borderTop: '1px solid #eee', paddingTop: '2rem', marginTop: '2rem' }}>
+                  <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', background: '#fafafa', borderRadius: '12px', marginTop: '2rem', marginBottom: '2rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                      <span style={{ color: '#666' }}>Sous-total</span>
+                      <span style={{ fontWeight: 600 }}>{subtotal.toFixed(2)} €</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                      <span style={{ color: '#666' }}>Frais d'envoi</span>
+                      <span style={{ fontWeight: 600 }}>{shippingCost.toFixed(2)} €</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 900 }}>
+                      <span>TOTAL</span>
+                      <span>{total.toFixed(2)} €</span>
+                    </div>
+                  </div>
+
                   {cartStep === 'cart' ? (
                     <>
-                      <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', background: '#fafafa', borderRadius: '12px', marginTop: '2rem' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                          <span style={{ color: '#666' }}>Sous-total</span>
-                          <span style={{ fontWeight: 600 }}>{subtotal.toFixed(2)} €</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '1rem' }}>
-                          <span style={{ color: '#666' }}>Frais d'envoi</span>
-                          <span style={{ fontWeight: 600 }}>{shippingCost.toFixed(2)} €</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 900 }}>
-                          <span>TOTAL</span>
-                          <span>{total.toFixed(2)} €</span>
-                        </div>
-                      </div>
                       <button 
                         onClick={() => setCartStep('checkout')}
                         style={{ 
@@ -493,15 +494,6 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
                     </>
                   ) : cartStep === 'checkout' ? (
                     <>
-                      <div style={{ background: '#f8f9fa', padding: '1rem', borderRadius: '8px', marginBottom: '2rem' }}>
-                         <div style={{ fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                           <Package size={14} /> RÉSUMÉ
-                         </div>
-                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
-                           <span>{cart.length} articles</span>
-                           <span style={{ fontWeight: 800 }}>{total} €</span>
-                         </div>
-                      </div>
                       <button 
                         onClick={() => {
                           const sanitizedFirstName = sanitizeString(customerInfo.firstName);
