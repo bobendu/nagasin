@@ -59,8 +59,8 @@ if ($found) {
     
     $messageText = $statusMessages[$newStatus] ?? "Le statut de votre commande a été mis à jour : " . $newStatus;
     
-    $headers = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+    $headers = "MIME-Version: 1.0\n";
+    $headers .= "Content-type:text/html;charset=UTF-8\n";
 
     $htmlContent = "
     <html>
@@ -96,8 +96,8 @@ if ($found) {
     </html>
     ";
 
-    $headers .= "From: Nagasin Studio <no-reply@nagasin.fr>" . "\r\n";
-    $headers .= "Reply-To: na@dessinateur.net" . "\r\n";
+    $headers .= "From: Nagasin Studio <no-reply@nagasin.fr>\n";
+    $headers .= "Reply-To: na@dessinateur.net\n";
     $headers .= "X-Mailer: PHP/" . phpversion();
     
     // Le 5ème paramètre -f est crucial chez certains hébergeurs comme OVH
