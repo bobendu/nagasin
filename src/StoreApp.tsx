@@ -1,7 +1,11 @@
-import { useState, useEffect } from 'react'
-import { ShoppingCart, X, Trash2, ShoppingBag, PenLine } from 'lucide-react'
+import { ShoppingCart, X, Trash2, ShoppingBag, PenLine, CreditCard, CheckCircle, Package } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements } from '@stripe/react-stripe-js'
 import './App.css'
+
+// Initialisation de Stripe (Clé publique factice pour la démo)
+const stripePromise = loadStripe('pk_test_placeholder')
 
 import type { Product } from './data/products'
 
@@ -13,13 +17,17 @@ import CustomPrintCard from './components/CustomPrintCard'
 import AdminToolbar from './components/admin/AdminToolbar'
 import AdminDashboard from './components/admin/AdminDashboard'
 import EditableProductCard from './components/admin/EditableProductCard'
+import PaymentForm from './components/PaymentForm'
 
-export default function StoreApp({ isAdmin, onLogout, onGoToLogin }: { isAdmin?: boolean, onLogout?: () => void, onGoToLogin?: () => void }) {
+export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }: { isAdmin?: boolean, adminToken?: string, onLogout?: () => void, onGoToLogin?: () => void }) {
   const [products, setProducts] = useState<Product[]>([])
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [cartStep, setCartStep] = useState<'cart' | 'checkout' | 'payment' | 'success'>('cart')
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false)
+  const [justAdded, setJustAdded] = useState<number | null>(null)
+  const [customerInfo, setCustomerInfo] = useState({ name: '', email: '', addr: '' })
 
   useEffect(() => {
     // Si Admin, on charge le brouillon s'il existe, sinon le catalogue public
@@ -55,7 +63,10 @@ export default function StoreApp({ isAdmin, onLogout, onGoToLogin }: { isAdmin?:
 
   const addToCart = (item: Product | any) => {
     setCart([...cart, { ...item, dedication: item.dedication || '' }])
-    setIsCartOpen(true)
+    setJustAdded(item.id)
+    setCartStep('cart') // Reset to cart step when adding something
+    setTimeout(() => setJustAdded(null), 2000)
+    // On ne force plus l'ouverture du panier pour laisser le client continuer
   }
 
   const removeFromCart = (index: number) => {
@@ -113,6 +124,46 @@ export default function StoreApp({ isAdmin, onLogout, onGoToLogin }: { isAdmin?:
     alert("Changements publiés avec succès ! Ils sont maintenant visibles par les clients.")
   }
 
+  const sanitizeString = (str: string) => {
+    return str.replace(/[<>]/g, '').trim();
+  }
+
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  const handleOrderSuccess = async (paymentId: string) => {
+    const order = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      customer: customerInfo,
+      items: cart,
+      total,
+      status: 'Payée',
+      paymentId
+    };
+
+    // Dispatch vers le Serveur (PHP API)
+    try {
+      const response = await fetch('/api/save_order.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order)
+      });
+      
+      if (!response.ok) throw new Error('Erreur serveur');
+      
+      console.log("Commande sauvegardée sur le serveur.");
+    } catch (err) {
+      console.warn("API indisponible, sauvegarde en LocalStorage (Fallback dev).", err);
+      const existingOrders = JSON.parse(localStorage.getItem('nagasin_orders') || '[]');
+      localStorage.setItem('nagasin_orders', JSON.stringify([order, ...existingOrders]));
+    }
+    
+    setCartStep('success');
+    setCart([]);
+  }
+
   return (
     <div className="app-layout">
       {isAdmin && (
@@ -127,6 +178,7 @@ export default function StoreApp({ isAdmin, onLogout, onGoToLogin }: { isAdmin?:
 
       <AdminDashboard 
         isOpen={isAdminDashboardOpen} 
+        adminToken={adminToken}
         onClose={() => setIsAdminDashboardOpen(false)} 
       />
 
@@ -224,103 +276,197 @@ export default function StoreApp({ isAdmin, onLogout, onGoToLogin }: { isAdmin?:
                 <X style={{ cursor: 'pointer' }} onClick={() => setIsCartOpen(false)} />
               </div>
 
-              <div style={{ flex: 1, overflowY: 'auto' }}>
-                {cart.length === 0 ? (
+              <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem' }}>
+                {cart.length === 0 && cartStep !== 'success' ? (
                   <div style={{ textAlign: 'center', padding: '4rem 0' }}>
                     <ShoppingBag size={40} color="#eee" style={{ marginBottom: '1rem' }} />
                     <p style={{ color: '#999', fontSize: '0.9rem' }}>Votre panier est vide.</p>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-                    {cart.map((item, index) => (
-                      <div key={index} style={{ borderBottom: '1px solid #f9f9f9', paddingBottom: '1.5rem' }}>
-                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                          <img src={item.image} style={{ width: '60px', height: '60px', objectFit: 'cover', background: '#f9f9f9' }} />
-                          <div style={{ flex: 1 }}>
-                            <h4 style={{ fontSize: '0.9rem', margin: '0 0 0.3rem' }}>{item.title}</h4>
-                            <span style={{ fontSize: '0.8rem', fontWeight: 800 }}>{item.price} €</span>
+                    {cartStep === 'cart' && (
+                      /* ÉTAPE 1 : LISTE DES ARTICLES */
+                      <>
+                        {cart.map((item, index) => (
+                          <div key={index} style={{ borderBottom: '1px solid #f9f9f9', paddingBottom: '1.5rem' }}>
+                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                              <img src={item.image} style={{ width: '60px', height: '60px', objectFit: 'cover', background: '#f9f9f9' }} />
+                              <div style={{ flex: 1 }}>
+                                <h4 style={{ fontSize: '0.9rem', margin: '0 0 0.3rem' }}>{item.title}</h4>
+                                <span style={{ fontSize: '0.8rem', fontWeight: 800 }}>{item.price} €</span>
+                              </div>
+                              <Trash2 
+                                size={16} color="#ccc" style={{ cursor: 'pointer' }} 
+                                onClick={() => removeFromCart(index)} 
+                              />
+                            </div>
+                            
+                            {item.canBeDedicated && (
+                              <div style={{ background: '#fcfcfc', padding: '1rem', border: '1px dashed #eee' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
+                                  <PenLine size={12} color="var(--primary-color)" />
+                                  <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--primary-color)' }}>DÉDICACE PERSONNALISÉE</span>
+                                </div>
+                                <textarea 
+                                  placeholder="À qui dois-je dédicacer ce tirage ?"
+                                  value={item.dedication}
+                                  onChange={(e) => updateDedication(index, e.target.value)}
+                                  style={{ 
+                                    width: '100%', border: 'none', background: 'transparent', 
+                                    fontSize: '0.8rem', outline: 'none', resize: 'none', fontStyle: 'italic' 
+                                  }}
+                                  rows={2}
+                                />
+                              </div>
+                            )}
                           </div>
-                          <Trash2 
-                            size={16} color="#ccc" style={{ cursor: 'pointer' }} 
-                            onClick={() => removeFromCart(index)} 
+                        ))}
+                      </>
+                    )}
+
+                    {cartStep === 'checkout' && (
+                      /* ÉTAPE 2 : FORMULAIRE CLIENT */
+                      <div style={{ marginTop: '1rem', padding: '1.5rem', background: '#f9f9f9', borderRadius: '12px' }}>
+                        <h4 style={{ fontSize: '0.8rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '1px' }}>INFOS DE LIVRAISON</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          <input 
+                            type="text" placeholder="Nom Complet" 
+                            value={customerInfo.name}
+                            onChange={(e) => setCustomerInfo({...customerInfo, name: e.target.value})}
+                            style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
+                          />
+                          <input 
+                            type="email" placeholder="Email" 
+                            value={customerInfo.email}
+                            onChange={(e) => setCustomerInfo({...customerInfo, email: e.target.value})}
+                            style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
+                          />
+                          <textarea 
+                            placeholder="Adresse de livraison complète" 
+                            value={customerInfo.addr}
+                            onChange={(e) => setCustomerInfo({...customerInfo, addr: e.target.value})}
+                            style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem', resize: 'none' }} rows={3} 
                           />
                         </div>
-                        
-                        {item.canBeDedicated && (
-                          <div style={{ background: '#fcfcfc', padding: '1rem', border: '1px dashed #eee' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
-                              <PenLine size={12} color="var(--primary-color)" />
-                              <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--primary-color)' }}>DÉDICACE PERSONNALISÉE</span>
-                            </div>
-                            <textarea 
-                              placeholder="À qui dois-je dédicacer ce tirage ?"
-                              value={item.dedication}
-                              onChange={(e) => updateDedication(index, e.target.value)}
-                              style={{ 
-                                width: '100%', border: 'none', background: 'transparent', 
-                                fontSize: '0.8rem', outline: 'none', resize: 'none', fontStyle: 'italic' 
-                              }}
-                              rows={2}
-                            />
-                          </div>
-                        )}
                       </div>
-                    ))}
+                    )}
 
-                    {/* FORMULAIRE CLIENT */}
-                    <div style={{ marginTop: '1rem', padding: '1.5rem', background: '#f9f9f9', borderRadius: '12px' }}>
-                      <h4 style={{ fontSize: '0.8rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '1px' }}>INFOS DE LIVRAISON</h4>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <input type="text" placeholder="Nom Complet" id="cust-name" style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} />
-                        <input type="email" placeholder="Email" id="cust-email" style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} />
-                        <textarea placeholder="Adresse de livraison complète" id="cust-addr" style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem', resize: 'none' }} rows={3} />
-                      </div>
-                    </div>
+                    {cartStep === 'payment' && (
+                      /* ÉTAPE 3 : PAIEMENT STRIPE */
+                      <Elements stripe={stripePromise}>
+                        <PaymentForm 
+                          total={total} 
+                          onSuccess={handleOrderSuccess} 
+                          onBack={() => setCartStep('checkout')} 
+                        />
+                      </Elements>
+                    )}
+
+                    {cartStep === 'success' && (
+                      /* ÉTAPE 4 : SUCCÈS */
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+                        style={{ textAlign: 'center', padding: '3rem 0' }}
+                      >
+                        <CheckCircle size={60} color="#22c55e" style={{ marginBottom: '1.5rem' }} />
+                        <h3 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '1rem' }}>COMMANDE RÉUSSIE !</h3>
+                        <p style={{ color: '#666', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '2rem' }}>
+                          Merci pour votre achat. Un email de confirmation a été envoyé à <strong>{customerInfo.email}</strong>.
+                        </p>
+                        <button 
+                          onClick={() => { setIsCartOpen(false); setCartStep('cart'); }}
+                          style={{ 
+                            background: '#000', color: '#fff', border: 'none', padding: '1rem 2rem', 
+                            fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', margin: '0 auto' 
+                          }}
+                        >
+                          RETOURNER À LA BOUTIQUE
+                        </button>
+                      </motion.div>
+                    )}
                   </div>
                 )}
               </div>
 
-              {cart.length > 0 && (
+              {cart.length > 0 && cartStep !== 'success' && (
                 <div style={{ borderTop: '1px solid #eee', paddingTop: '2rem', marginTop: '2rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                    <span style={{ fontWeight: 800 }}>TOTAL</span>
-                    <span style={{ fontWeight: 900, fontSize: '1.4rem' }}>{total} €</span>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      const name = (document.getElementById('cust-name') as HTMLInputElement)?.value;
-                      const email = (document.getElementById('cust-email') as HTMLInputElement)?.value;
-                      const addr = (document.getElementById('cust-addr') as HTMLTextAreaElement)?.value;
-                      
-                      if (!name || !addr) {
-                        alert("Merci de remplir vos infos de livraison.");
-                        return;
-                      }
+                  {cartStep === 'cart' ? (
+                    <>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
+                        <span style={{ fontWeight: 800 }}>TOTAL</span>
+                        <span style={{ fontWeight: 900, fontSize: '1.4rem' }}>{total} €</span>
+                      </div>
+                      <button 
+                        onClick={() => setCartStep('checkout')}
+                        style={{ 
+                          width: '100%', background: 'var(--primary-color)', color: 'white', 
+                          padding: '1.2rem', border: 'none', fontWeight: 900, letterSpacing: '2px',
+                          cursor: 'pointer', marginBottom: '1rem'
+                        }}
+                      >
+                        PASSER À LA LIVRAISON
+                      </button>
+                      <button 
+                        onClick={() => setIsCartOpen(false)}
+                        style={{ 
+                          width: '100%', background: 'transparent', color: '#000', 
+                          padding: '1rem', border: '1px solid #000', fontWeight: 800, fontSize: '0.7rem',
+                          letterSpacing: '1px', cursor: 'pointer'
+                        }}
+                      >
+                        CONTINUER MES ACHATS
+                      </button>
+                    </>
+                  ) : cartStep === 'checkout' ? (
+                    <>
+                      <div style={{ background: '#f8f9fa', padding: '1rem', borderRadius: '8px', marginBottom: '2rem' }}>
+                         <div style={{ fontSize: '0.75rem', fontWeight: 800, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                           <Package size={14} /> RÉSUMÉ
+                         </div>
+                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+                           <span>{cart.length} articles</span>
+                           <span style={{ fontWeight: 800 }}>{total} €</span>
+                         </div>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          const sanitizedName = sanitizeString(customerInfo.name);
+                          const sanitizedEmail = customerInfo.email.trim();
+                          const sanitizedAddr = sanitizeString(customerInfo.addr);
 
-                      const order = {
-                        id: Date.now(),
-                        date: new Date().toISOString(),
-                        customer: { name, email, addr },
-                        items: cart,
-                        total,
-                        status: 'En attente'
-                      };
+                          if (!sanitizedName || !sanitizedEmail || !sanitizedAddr) {
+                            alert("Merci de remplir toutes les informations de livraison.");
+                            return;
+                          }
 
-                      const existingOrders = JSON.parse(localStorage.getItem('nagasin_orders') || '[]');
-                      localStorage.setItem('nagasin_orders', JSON.stringify([order, ...existingOrders]));
-                      
-                      alert("Commande enregistrée ! (Simulation)");
-                      setCart([]);
-                      setIsCartOpen(false);
-                    }}
-                    style={{ 
-                      width: '100%', background: 'var(--primary-color)', color: 'white', 
-                      padding: '1.2rem', border: 'none', fontWeight: 900, letterSpacing: '2px',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    CONFIRMER LA COMMANDE
-                  </button>
+                          if (!validateEmail(sanitizedEmail)) {
+                            alert("Format d'email invalide.");
+                            return;
+                          }
+
+                          setCustomerInfo({ name: sanitizedName, email: sanitizedEmail, addr: sanitizedAddr });
+                          setCartStep('payment');
+                        }}
+                        style={{ 
+                          width: '100%', background: '#000', color: 'white', 
+                          padding: '1.2rem', border: 'none', fontWeight: 900, letterSpacing: '2px',
+                          cursor: 'pointer', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
+                        }}
+                      >
+                        <CreditCard size={18} /> PASSER AU PAIEMENT
+                      </button>
+                      <button 
+                        onClick={() => setCartStep('cart')}
+                        style={{ 
+                          width: '100%', background: 'transparent', color: '#666', 
+                          padding: '0.5rem', border: 'none', fontWeight: 800, fontSize: '0.7rem',
+                          letterSpacing: '1px', cursor: 'pointer'
+                        }}
+                      >
+                        RETOUR AU PANIER
+                      </button>
+                    </>
+                  ) : null}
                 </div>
               )}
             </motion.div>
@@ -329,8 +475,12 @@ export default function StoreApp({ isAdmin, onLogout, onGoToLogin }: { isAdmin?:
       </AnimatePresence>
 
       {/* BANDEAU PANIER FIXE EN BAS */}
-      <div 
+      <motion.div 
         onClick={() => setIsCartOpen(true)}
+        animate={{ 
+          scale: justAdded ? [1, 1.05, 1] : 1,
+          backgroundColor: justAdded ? '#00c853' : '#004169'
+        }}
         style={{ 
           position: 'fixed', 
           bottom: 0, 
@@ -353,8 +503,8 @@ export default function StoreApp({ isAdmin, onLogout, onGoToLogin }: { isAdmin?:
         }}
       >
         <ShoppingCart size={20} strokeWidth={3} />
-        VOIR MON PANIER ({cart.length})
-      </div>
+        {justAdded ? 'ARTICLE AJOUTÉ !' : `VOIR MON PANIER (${cart.length})`}
+      </motion.div>
     </div>
   )
 }

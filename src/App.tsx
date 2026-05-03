@@ -7,6 +7,7 @@ function App() {
   const [view, setView] = useState<'maintenance' | 'login' | 'admin' | 'store'>('maintenance')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [password, setPassword] = useState('')
+  const [adminToken, setAdminToken] = useState('') // Stocke le password pour l'API
   const [user, setUser] = useState('')
 
   const [, setSecretClicks] = useState(0)
@@ -30,8 +31,10 @@ function App() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
-    if (user.toLowerCase() === 'na' && password === 'nagasin2026') {
+    const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'nagasin2026'
+    if (user.toLowerCase() === 'na' && password === adminPassword) {
       setIsLoggedIn(true)
+      setAdminToken(password)
       setView('store')
     } else {
       alert("Accès refusé.")
@@ -94,8 +97,10 @@ function App() {
   return (
     <StoreApp 
       isAdmin={isLoggedIn} 
+      adminToken={adminToken}
       onLogout={() => {
         setIsLoggedIn(false)
+        setAdminToken('')
         setView('store')
       }}
       onGoToLogin={() => setView('login')}

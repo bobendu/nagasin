@@ -58,3 +58,32 @@
 - **Passage Secret** : Ajout d'un lien discret sur le point final du copyright pour accéder à l'administration sans URL visible.
 - **Responsivité Avancée** : Refonte du `CustomPrintCard` pour un affichage parfait sur mobile (empilement vertical et zones de texte extensibles).
 - **Passage Secret (Amélioration)** : Implémentation d'un déclencheur sur le logo (5 clics) pour accéder à la boutique sans lever le mode maintenance public.
+
+## 2026-05-03 : Version 0.2.0 - Parcours Client Optimisé
+- **Fluidité d'Achat** : Ajout d'une notification visuelle sur le bandeau panier lors de l'ajout d'un article, permettant au client de continuer ses achats sans interruption (le panier ne s'ouvre plus automatiquement).
+- **Tunnel de Commande en 2 Étapes** : 
+    - **Étape 1 (Panier)** : Revue des articles et gestion des dédicaces avec bouton "Continuer mes achats" explicite.
+    - **Étape 2 (Confirmation)** : Séparation du formulaire de livraison et du récapitulatif final pour une meilleure clarté avant validation.
+- **Micro-animations** : Ajout d'animations Framer Motion sur le bandeau panier pour confirmer visuellement l'ajout d'un produit (changement de couleur et pulsation).
+
+## 2026-05-03 : Version 0.3.0 - Intégration Paiement & Dash Admin
+- **Tunnel d'Achat Complet** : 
+    - Implémentation du passage de la livraison au paiement.
+    - Intégration de **Stripe** via `@stripe/react-stripe-js` pour une expérience de paiement sécurisée et professionnelle.
+- **Gestion des Commandes** :
+    - Dispatch automatique des commandes payées vers le dashboard administrateur.
+    - Ajout du suivi des **IDs de transaction Stripe** pour chaque commande.
+- **Dashboard Admin (V2)** : 
+    - Refonte visuelle de la liste des commandes pour inclure les statuts de paiement (Payée/En attente).
+    - Amélioration des fiches d'expédition avec icônes et typographie soignée.
+    - Support de l'impression des tirages personnalisés avec un nouveau bouton d'accès rapide.
+
+## 2026-05-03 : Version 0.4.0 - Persistance Serveur (Backend PHP)
+- **Migration Data** : Passage du stockage local (`localStorage`) vers un stockage serveur sécurisé pour garantir l'intégrité des commandes.
+- **API PHP Intégrée** : 
+    - Création de `save_order.php` pour la réception sécurisée des commandes.
+    - Création de `get_orders.php` avec authentification par en-tête pour l'administration.
+- **Sécurité Serveur** : 
+    - Isolation des données dans un dossier protégé par `.htaccess`.
+    - Authentification croisée entre le frontend et le backend PHP via le token admin.
+- **Hybride Dev/Prod** : Implémentation d'un système de "Fallback" intelligent permettant de continuer le développement en local (localStorage) tout en utilisant l'API réelle en production.
