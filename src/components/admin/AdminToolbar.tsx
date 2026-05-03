@@ -1,6 +1,8 @@
 import { LayoutDashboard, Lock, Settings, PlusCircle } from 'lucide-react'
 
 export default function AdminToolbar({ onOpenDashboard, onAddProduct }: { onOpenDashboard: () => void, onAddProduct: () => void }) {
+  const logoBlue = '#004369'
+
   return (
     <div style={{
       position: 'fixed',
@@ -36,7 +38,7 @@ export default function AdminToolbar({ onOpenDashboard, onAddProduct }: { onOpen
         padding: '0 2rem',
         color: 'white'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', color: '#00e5ff', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '2px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', color: logoBlue, fontSize: '0.7rem', fontWeight: 900, letterSpacing: '2px' }}>
           <Lock size={14} /> MODE ÉDITION
         </div>
 
@@ -54,9 +56,10 @@ export default function AdminToolbar({ onOpenDashboard, onAddProduct }: { onOpen
           <button 
             onClick={onAddProduct}
             style={{ 
-              background: '#00e5ff', border: 'none', color: 'black', cursor: 'pointer', 
-              padding: '8px 20px', borderRadius: '4px',
-              display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 900 
+              background: logoBlue, color: 'white', border: 'none', cursor: 'pointer', 
+              padding: '10px 24px', borderRadius: '0',
+              display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 900,
+              letterSpacing: '1px'
             }}
           >
             <PlusCircle size={16} /> NOUVEAU PRODUIT
