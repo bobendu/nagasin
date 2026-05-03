@@ -36,7 +36,6 @@ function App() {
         </aside>
         <main className="maintenance-main">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="maintenance-content">
-             <h4 className="maintenance-tag">OFFICIEL</h4>
              <h1 className="maintenance-title">LE NAGASIN <br />EST EN TRAVAUX.</h1>
              <p className="maintenance-desc">
                La boutique officielle de <strong>na!</strong> prépare ses rayons. <br />
