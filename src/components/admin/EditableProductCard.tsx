@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { ArrowRight, PenLine, Trash2, Camera, Save, X, Eye, EyeOff } from 'lucide-react'
+import { ArrowRight, PenLine, Trash2, Camera, Save, X } from 'lucide-react'
 import type { Product } from '../../data/products'
 
 interface EditableProductCardProps {

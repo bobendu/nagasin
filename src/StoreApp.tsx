@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ShoppingCart, ArrowRight, X, Trash2, ShoppingBag, PenLine } from 'lucide-react'
+import { ShoppingCart, X, Trash2, ShoppingBag, PenLine } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import './App.css'
 
@@ -14,7 +14,7 @@ import AdminToolbar from './components/admin/AdminToolbar'
 import AdminDashboard from './components/admin/AdminDashboard'
 import EditableProductCard from './components/admin/EditableProductCard'
 
-export default function StoreApp({ isAdmin, onEdit }: { isAdmin?: boolean, onEdit?: () => void }) {
+export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
   const [products, setProducts] = useState<Product[]>([])
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)

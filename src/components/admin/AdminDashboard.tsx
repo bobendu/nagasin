@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, TrendingUp, ShoppingBag, Users, Euro, Calendar, Printer, User, Mail, MapPin, ExternalLink } from 'lucide-react'
+import { X, TrendingUp, ShoppingBag, Users, Euro, Calendar, Printer, User, Mail, MapPin } from 'lucide-react'
 
 interface Order {
   id: number;

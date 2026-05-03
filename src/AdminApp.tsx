@@ -27,7 +27,6 @@ export default function AdminApp({ onBack }: { onBack: () => void }) {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [uploadingId, setUploadingId] = useState<number | null>(null)
   const [activeTab, setActiveTab] = useState<'catalog' | 'orders'>('catalog')
 
   useEffect(() => {
@@ -52,11 +51,9 @@ export default function AdminApp({ onBack }: { onBack: () => void }) {
   }
 
   const handleUpload = async (id: number, file: File) => {
-    setUploadingId(id)
     const reader = new FileReader()
     reader.onloadend = () => {
       updateProduct(id, 'image', reader.result as string)
-      setUploadingId(null)
     }
     reader.readAsDataURL(file)
   }

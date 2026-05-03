@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ExternalLink, ShoppingCart, Info, Globe, Maximize2, RotateCcw, Home, ChevronLeft, PenLine, Search, X, Check } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ExternalLink, ShoppingCart, Globe, RotateCcw, Home, ChevronLeft, Search, X } from 'lucide-react'
 
 interface CustomPrintCardProps {
   onAddToCart: (item: any) => void;

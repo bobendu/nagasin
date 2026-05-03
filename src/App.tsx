@@ -5,8 +5,6 @@ import { motion } from 'framer-motion'
 import { Lock, Edit3 } from 'lucide-react'
 
 function App() {
-  const isAdminPath = window.location.pathname.includes('nadmin') || window.location.search.includes('nadmin')
-  
   const [view, setView] = useState<'maintenance' | 'login' | 'admin' | 'store'>('store')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [password, setPassword] = useState('')
