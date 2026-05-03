@@ -6,74 +6,54 @@ export default function AdminToolbar({ onOpenDashboard, onAddProduct }: { onOpen
   return (
     <div style={{
       position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      height: 'auto',
-      background: 'white',
+      top: '1.5rem',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      background: '#050505',
+      padding: '8px 24px',
+      borderRadius: '0', // Coins carrés
       display: 'flex',
+      alignItems: 'center',
+      gap: '24px',
       zIndex: 2000,
-      borderBottom: '1px solid #f2f2f2'
+      boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+      border: `1px solid ${logoBlue}`
     }}>
-      {/* LOGO SECTION (BLOC BLANC SANS MARGE) */}
-      <div style={{ 
-        width: '200px', 
-        background: 'white',
-        borderRight: '1px solid #f2f2f2'
-      }}>
-        <img 
-          src="https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg" 
-          alt="na!" 
-          style={{ width: '100%', display: 'block' }} 
-        />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: logoBlue, fontSize: '0.7rem', fontWeight: 900, letterSpacing: '2px' }}>
+        <Lock size={14} /> MODE ÉDITION
       </div>
+      
+      <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.1)' }} />
 
-      {/* ADMIN CONTROLS SECTION (BANDEAU NOIR / DARK) */}
-      <div style={{ 
-        flex: 1, 
-        background: '#050505', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        padding: '0 2rem',
-        color: 'white'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', color: logoBlue, fontSize: '0.7rem', fontWeight: 900, letterSpacing: '2px' }}>
-          <Lock size={14} /> MODE ÉDITION
-        </div>
+      <button 
+        onClick={onOpenDashboard}
+        style={{ 
+          background: 'none', border: 'none', color: 'white', cursor: 'pointer', 
+          display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 700 
+        }}
+      >
+        <LayoutDashboard size={16} /> DASHBOARD
+      </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
-          <button 
-            onClick={onOpenDashboard}
-            style={{ 
-              background: 'none', border: 'none', color: 'white', cursor: 'pointer', 
-              display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 700 
-            }}
-          >
-            <LayoutDashboard size={16} /> DASHBOARD
-          </button>
+      <button 
+        onClick={onAddProduct}
+        style={{ 
+          background: logoBlue, color: 'white', border: 'none', cursor: 'pointer', 
+          padding: '8px 20px', borderRadius: '0', // Coins carrés
+          display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 900,
+          letterSpacing: '1px'
+        }}
+      >
+        <PlusCircle size={16} /> NOUVEAU PRODUIT
+      </button>
 
-          <button 
-            onClick={onAddProduct}
-            style={{ 
-              background: logoBlue, color: 'white', border: 'none', cursor: 'pointer', 
-              padding: '10px 24px', borderRadius: '0',
-              display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 900,
-              letterSpacing: '1px'
-            }}
-          >
-            <PlusCircle size={16} /> NOUVEAU PRODUIT
-          </button>
-
-          <button 
-            style={{ 
-              background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer'
-            }}
-          >
-            <Settings size={18} />
-          </button>
-        </div>
-      </div>
+      <button 
+        style={{ 
+          background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer'
+        }}
+      >
+        <Settings size={18} />
+      </button>
     </div>
   )
 }
