@@ -31,33 +31,34 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   const [customerInfo, setCustomerInfo] = useState({ name: '', email: '', addr: '' })
 
   useEffect(() => {
-    // Si Admin, on charge le brouillon s'il existe, sinon le catalogue public
-    // Si Client, on charge UNIQUEMENT le catalogue public
-    const publicCatalog = localStorage.getItem('nagasin_catalog')
+    // Si Admin, on charge le brouillon local s'il existe
+    // Sinon, on charge le catalogue public depuis le SERVEUR
     const draftCatalog = localStorage.getItem('nagasin_catalog_draft')
 
-    if (isAdmin) {
-      if (draftCatalog) {
+    const loadCatalog = async () => {
+      if (isAdmin && draftCatalog) {
         setProducts(JSON.parse(draftCatalog))
         setHasUnsavedChanges(true)
-      } else if (publicCatalog) {
-        setProducts(JSON.parse(publicCatalog))
       } else {
-        fetch('/api/products.json')
-          .then(res => res.json())
-          .then(data => { setProducts(data); localStorage.setItem('nagasin_catalog', JSON.stringify(data)); })
-          .catch(err => console.error("Erreur chargement catalogue:", err))
+        try {
+          const response = await fetch('/api/catalog.php');
+          if (response.ok) {
+            const data = await response.json();
+            setProducts(data);
+          } else {
+            throw new Error('Fallback products.json');
+          }
+        } catch (err) {
+          // Fallback ultime sur le fichier statique
+          fetch('/api/products.json')
+            .then(res => res.json())
+            .then(data => setProducts(data))
+            .catch(e => console.error("Erreur chargement catalogue:", e))
+        }
       }
-    } else {
-      if (publicCatalog) {
-        setProducts(JSON.parse(publicCatalog))
-      } else {
-        fetch('/api/products.json')
-          .then(res => res.json())
-          .then(data => setProducts(data))
-          .catch(err => console.error("Erreur chargement catalogue:", err))
-      }
-    }
+    };
+
+    loadCatalog();
   }, [isAdmin])
 
   const total = cart.reduce((sum: number, item: CartItem) => sum + item.price, 0)
@@ -118,11 +119,26 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     setHasUnsavedChanges(true)
   }
 
-  const handlePublish = () => {
-    localStorage.setItem('nagasin_catalog', JSON.stringify(products))
-    localStorage.removeItem('nagasin_catalog_draft')
-    setHasUnsavedChanges(false)
-    alert("Changements publiés avec succès ! Ils sont maintenant visibles par les clients.")
+  const handlePublish = async () => {
+    try {
+      const response = await fetch('/api/catalog.php', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Admin-Password': adminToken || ''
+        },
+        body: JSON.stringify(products)
+      });
+
+      if (!response.ok) throw new Error('Erreur publication');
+
+      localStorage.removeItem('nagasin_catalog_draft')
+      setHasUnsavedChanges(false)
+      alert("Changements publiés avec succès ! Ils sont maintenant synchronisés sur tous les appareils.")
+    } catch (err) {
+      alert("Erreur lors de la publication sur le serveur.");
+      console.error(err);
+    }
   }
 
   const sanitizeString = (str: string) => {
