@@ -49,59 +49,26 @@ if ($found) {
     
     // ENVOI DE L'EMAIL AU CLIENT
     $to = $orderData['customer']['email'];
-    $subject = "Mise à jour de votre commande Nagasin #" . substr($orderId, -6);
+    $subject = "Commande Nagasin #" . substr($orderId, -6) . " - " . $newStatus;
     
     $statusMessages = [
-        "Payée" => "Votre commande a bien été reçue et est en attente de traitement.",
-        "En préparation" => "Bonne nouvelle ! Votre commande est en cours de préparation dans notre studio.",
-        "Expédiée" => "Votre commande a été expédiée ! Elle devrait arriver chez vous très prochainement."
+        "Payée" => "Votre commande a bien été reçue.",
+        "En préparation" => "Votre commande est en cours de préparation.",
+        "Expédiée" => "Votre commande a été expédiée !"
     ];
     
-    $messageText = $statusMessages[$newStatus] ?? "Le statut de votre commande a été mis à jour : " . $newStatus;
+    $messageText = $statusMessages[$newStatus] ?? "Statut : " . $newStatus;
     
-    $headers = "MIME-Version: 1.0\n";
-    $headers .= "Content-type:text/html;charset=UTF-8\n";
+    $plainContent = "Bonjour " . $orderData['customer']['name'] . ",\n\n";
+    $plainContent .= $messageText . "\n\n";
+    $plainContent .= "Suivi de votre commande #" . $orderId . "\n";
+    $plainContent .= "Merci de votre confiance,\nna!";
 
-    $htmlContent = "
-    <html>
-    <head>
-        <title>Suivi de commande Nagasin</title>
-        <style>
-            body { font-family: 'Helvetica', sans-serif; color: #333; line-height: 1.6; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; }
-            .header { background: #004169; color: white; padding: 20px; text-align: center; }
-            .content { padding: 30px; }
-            .footer { font-size: 12px; color: #999; text-align: center; padding: 20px; }
-            .status-badge { background: #f0fdf4; color: #22c55e; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
-        </style>
-    </head>
-    <body>
-        <div class='container'>
-            <div class='header'>
-                <h1>NAGASIN.</h1>
-            </div>
-            <div class='content'>
-                <p>Bonjour " . $orderData['customer']['name'] . ",</p>
-                <p>" . $messageText . "</p>
-                <p><strong>Statut actuel :</strong> <span class='status-badge'>" . $newStatus . "</span></p>
-                <hr style='border:none; border-top:1px solid #eee; margin:20px 0;'>
-                <p>Merci de votre confiance,<br><strong>na!</strong></p>
-            </div>
-            <div class='footer'>
-                Ceci est un email automatique pour la commande #" . substr($orderId, -6) . ".<br>
-                Nagasin Studio - na@dessinateur.net
-            </div>
-        </div>
-    </body>
-    </html>
-    ";
-
-    $headers .= "From: Nagasin Studio <no-reply@nagasin.fr>\n";
+    $headers = "From: Nagasin Studio <no-reply@nagasin.fr>\n";
     $headers .= "Reply-To: na@dessinateur.net\n";
     $headers .= "X-Mailer: PHP/" . phpversion();
     
-    // Le 5ème paramètre -f est crucial chez certains hébergeurs comme OVH
-    $sent = @mail($to, $subject, $htmlContent, $headers, "-f no-reply@nagasin.fr");
+    $sent = @mail($to, $subject, $plainContent, $headers, "-f no-reply@nagasin.fr");
 
     echo json_encode(["status" => "success", "newStatus" => $newStatus, "mailSent" => $sent]);
 } else {
