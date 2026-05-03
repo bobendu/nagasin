@@ -490,23 +490,38 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
                       </div>
                       <button 
                         onClick={() => {
-                          const { firstName, lastName, email, emailConfirm, address, zipCode, city } = customerInfo;
+                          const sanitizedFirstName = sanitizeString(customerInfo.firstName);
+                          const sanitizedLastName = sanitizeString(customerInfo.lastName);
+                          const sanitizedEmail = customerInfo.email.trim();
+                          const sanitizedEmailConfirm = customerInfo.emailConfirm.trim();
+                          const sanitizedAddress = sanitizeString(customerInfo.address);
+                          const sanitizedZipCode = sanitizeString(customerInfo.zipCode);
+                          const sanitizedCity = sanitizeString(customerInfo.city);
 
-                          if (!firstName || !lastName || !email || !address || !zipCode || !city) {
+                          if (!sanitizedFirstName || !sanitizedLastName || !sanitizedEmail || !sanitizedAddress || !sanitizedZipCode || !sanitizedCity) {
                             alert("Merci de remplir toutes les informations de livraison.");
                             return;
                           }
 
-                          if (!validateEmail(email)) {
+                          if (!validateEmail(sanitizedEmail)) {
                             alert("Format d'email invalide.");
                             return;
                           }
 
-                          if (email !== emailConfirm) {
+                          if (sanitizedEmail !== sanitizedEmailConfirm) {
                             alert("Les adresses email ne correspondent pas.");
                             return;
                           }
 
+                          setCustomerInfo({
+                            firstName: sanitizedFirstName,
+                            lastName: sanitizedLastName,
+                            email: sanitizedEmail,
+                            emailConfirm: sanitizedEmailConfirm,
+                            address: sanitizedAddress,
+                            zipCode: sanitizedZipCode,
+                            city: sanitizedCity
+                          });
                           setCartStep('payment');
                         }}
                         style={{ 
