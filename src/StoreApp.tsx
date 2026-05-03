@@ -16,21 +16,40 @@ import EditableProductCard from './components/admin/EditableProductCard'
 
 export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
   const [products, setProducts] = useState<Product[]>([])
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false)
 
   useEffect(() => {
-    const saved = localStorage.getItem('nagasin_catalog')
-    if (saved) {
-      setProducts(JSON.parse(saved))
+    // Si Admin, on charge le brouillon s'il existe, sinon le catalogue public
+    // Si Client, on charge UNIQUEMENT le catalogue public
+    const publicCatalog = localStorage.getItem('nagasin_catalog')
+    const draftCatalog = localStorage.getItem('nagasin_catalog_draft')
+
+    if (isAdmin) {
+      if (draftCatalog) {
+        setProducts(JSON.parse(draftCatalog))
+        setHasUnsavedChanges(true)
+      } else if (publicCatalog) {
+        setProducts(JSON.parse(publicCatalog))
+      } else {
+        fetch('/api/products.json')
+          .then(res => res.json())
+          .then(data => { setProducts(data); localStorage.setItem('nagasin_catalog', JSON.stringify(data)); })
+          .catch(err => console.error("Erreur chargement catalogue:", err))
+      }
     } else {
-      fetch('/api/products.json')
-        .then(res => res.json())
-        .then(data => setProducts(data))
-        .catch(err => console.error("Erreur chargement catalogue:", err))
+      if (publicCatalog) {
+        setProducts(JSON.parse(publicCatalog))
+      } else {
+        fetch('/api/products.json')
+          .then(res => res.json())
+          .then(data => setProducts(data))
+          .catch(err => console.error("Erreur chargement catalogue:", err))
+      }
     }
-  }, [])
+  }, [isAdmin])
 
   const total = cart.reduce((sum, item) => sum + item.price, 0)
 
@@ -54,14 +73,16 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
   const handleUpdateProduct = (id: number, updates: Partial<Product>) => {
     const newProducts = products.map(p => p.id === id ? { ...p, ...updates } : p)
     setProducts(newProducts)
-    localStorage.setItem('nagasin_catalog', JSON.stringify(newProducts))
+    localStorage.setItem('nagasin_catalog_draft', JSON.stringify(newProducts))
+    setHasUnsavedChanges(true)
   }
 
   const handleDeleteProduct = (id: number) => {
-    if (confirm("Supprimer cet article ?")) {
+    if (confirm("Supprimer ce produit ?")) {
       const newProducts = products.filter(p => p.id !== id)
       setProducts(newProducts)
-      localStorage.setItem('nagasin_catalog', JSON.stringify(newProducts))
+      localStorage.setItem('nagasin_catalog_draft', JSON.stringify(newProducts))
+      setHasUnsavedChanges(true)
     }
   }
 
@@ -81,7 +102,15 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
     }
     const newProducts = [newProduct, ...products]
     setProducts(newProducts)
-    localStorage.setItem('nagasin_catalog', JSON.stringify(newProducts))
+    localStorage.setItem('nagasin_catalog_draft', JSON.stringify(newProducts))
+    setHasUnsavedChanges(true)
+  }
+
+  const handlePublish = () => {
+    localStorage.setItem('nagasin_catalog', JSON.stringify(products))
+    localStorage.removeItem('nagasin_catalog_draft')
+    setHasUnsavedChanges(false)
+    alert("Changements publiés avec succès ! Ils sont maintenant visibles par les clients.")
   }
 
   return (
@@ -90,6 +119,8 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
         <AdminToolbar 
           onOpenDashboard={() => setIsAdminDashboardOpen(true)} 
           onAddProduct={handleAddProduct}
+          onPublish={handlePublish}
+          hasChanges={hasUnsavedChanges}
         />
       )}
 
