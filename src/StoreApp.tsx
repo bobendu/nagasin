@@ -146,11 +146,6 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
           </motion.div>
         </header>
 
-        {/* PRODUIT INTERACTIF (TON IDÉE DE OUF) */}
-        <div style={{ marginBottom: '5rem' }}>
-          <CustomPrintCard onAddToCart={addToCart} />
-        </div>
-
         {/* CATALOGUE */}
         <section id="catalogue" className="product-grid">
           {products.map((item) => (
@@ -164,6 +159,11 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
             />
           ))}
         </section>
+
+        {/* PRODUIT INTERACTIF (L'INTELLIGENT) */}
+        <div style={{ marginTop: '5rem', marginBottom: '5rem' }}>
+          <CustomPrintCard onAddToCart={addToCart} />
+        </div>
 
         {/* SECTION CONTACT / INFOS (FIN DE PAGE) */}
         <section style={{ borderTop: '1px solid #eee', marginTop: '6rem', padding: '4rem 0' }}>
