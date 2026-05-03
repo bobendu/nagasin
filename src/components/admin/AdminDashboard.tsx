@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, TrendingUp, ShoppingBag, Users, Euro, Calendar, Printer, User, Mail, MapPin, CreditCard } from 'lucide-react'
+import { X, TrendingUp, ShoppingBag, Users, Euro, Calendar, Printer, User, Mail, MapPin, CreditCard, Truck, Settings } from 'lucide-react'
 
 interface Order {
   id: number;
@@ -12,9 +12,16 @@ interface Order {
   paymentId?: string;
 }
 
-export default function AdminDashboard({ isOpen, onClose, adminToken }: { isOpen: boolean, onClose: () => void, adminToken?: string }) {
+export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCost, onUpdateShipping }: { 
+  isOpen: boolean, 
+  onClose: () => void, 
+  adminToken?: string,
+  shippingCost: number,
+  onUpdateShipping: (val: number) => void
+}) {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(false)
+  const [isEditingSettings, setIsEditingSettings] = useState(false)
   
   useEffect(() => {
     if (!isOpen) return;
@@ -108,18 +115,65 @@ export default function AdminDashboard({ isOpen, onClose, adminToken }: { isOpen
               <h2 style={{ fontSize: '1.8rem', fontWeight: 900, margin: 0, color: '#000' }}>CONSOLE NAGASIN</h2>
               <p style={{ fontSize: '0.85rem', color: '#666', margin: '5px 0 0' }}>Tableau de bord et suivi des ventes {loading && "(Chargement...)"}</p>
             </div>
-            <button 
-              onClick={onClose}
-              style={{ background: '#f5f5f5', border: 'none', padding: '12px', borderRadius: '50%', cursor: 'pointer' }}
-            >
-              <X size={24} />
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              <button 
+                onClick={() => setIsEditingSettings(!isEditingSettings)}
+                style={{ 
+                  background: isEditingSettings ? 'var(--primary-color)' : '#f5f5f5', 
+                  color: isEditingSettings ? 'white' : '#000',
+                  border: 'none', padding: '12px', borderRadius: '12px', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 700
+                }}
+              >
+                <Settings size={18} /> RÉGLAGES
+              </button>
+              <button 
+                onClick={onClose}
+                style={{ background: '#f5f5f5', border: 'none', padding: '12px', borderRadius: '50%', cursor: 'pointer' }}
+              >
+                <X size={24} />
+              </button>
+            </div>
           </div>
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '3rem' }}>
+            
+            {/* SETTINGS PANEL */}
+            <AnimatePresence>
+              {isEditingSettings && (
+                <motion.div 
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  style={{ overflow: 'hidden', marginBottom: '3rem', background: '#f8f9fa', borderRadius: '16px', border: '1px solid #eee' }}
+                >
+                  <div style={{ padding: '2rem' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 900, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <Truck size={18} /> CONFIGURATION DES FRAIS DE PORT
+                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <div style={{ background: '#fff', padding: '10px 20px', borderRadius: '8px', border: '1px solid #ddd', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <input 
+                          type="number" 
+                          step="0.1"
+                          value={shippingCost}
+                          onChange={(e) => onUpdateShipping(parseFloat(e.target.value))}
+                          style={{ border: 'none', outline: 'none', fontSize: '1.2rem', fontWeight: 800, width: '80px' }}
+                        />
+                        <span style={{ fontWeight: 800 }}>€</span>
+                      </div>
+                      <p style={{ fontSize: '0.85rem', color: '#666', margin: 0 }}>
+                        Ces frais seront ajoutés automatiquement au total du panier de chaque client.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* STATS CARDS */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '4rem' }}>
-              <StatCard icon={<Euro size={20} />} label="CHIFFRE D'AFFAIRES" value={`${stats.revenue} €`} color="#00e5ff" />
+              <StatCard icon={<Euro size={20} />} label="CHIFFRE D'AFFAIRES" value={`${stats.revenue.toFixed(2)} €`} color="#00e5ff" />
               <StatCard icon={<ShoppingBag size={20} />} label="COMMANDES" value={stats.count} color="#ffd700" />
               <StatCard icon={<Users size={20} />} label="CLIENTS UNIQUES" value={stats.customers} color="#ff4081" />
               <StatCard icon={<TrendingUp size={20} />} label="PANIER MOYEN" value={`${stats.average} €`} color="#7c4dff" />
@@ -153,7 +207,7 @@ export default function AdminDashboard({ isOpen, onClose, adminToken }: { isOpen
                          )}
                        </div>
                        <div style={{ textAlign: 'right' }}>
-                         <span style={{ fontSize: '1.1rem', fontWeight: 900 }}>{o.total} €</span>
+                         <span style={{ fontSize: '1.1rem', fontWeight: 900 }}>{o.total.toFixed(2)} €</span>
                          <div style={{ 
                             fontSize: '0.65rem', 
                             fontWeight: 900, 

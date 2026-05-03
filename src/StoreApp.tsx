@@ -27,6 +27,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [cartStep, setCartStep] = useState<'cart' | 'checkout' | 'payment' | 'success'>('cart')
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false)
+  const [shippingCost, setShippingCost] = useState(5.00)
   const [justAdded, setJustAdded] = useState<number | null>(null)
   const [customerInfo, setCustomerInfo] = useState({ 
     firstName: '', 
@@ -69,7 +70,8 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     loadCatalog();
   }, [isAdmin])
 
-  const total = cart.reduce((sum: number, item: CartItem) => sum + item.price, 0)
+  const subtotal = cart.reduce((sum: number, item: CartItem) => sum + item.price, 0)
+  const total = subtotal + (cart.length > 0 ? shippingCost : 0)
 
   const addToCart = (item: Product | any) => {
     setCart([...cart, { ...item, dedication: item.dedication || '' }])
@@ -208,6 +210,8 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
       <AdminDashboard 
         isOpen={isAdminDashboardOpen} 
         adminToken={adminToken}
+        shippingCost={shippingCost}
+        onUpdateShipping={(val) => setShippingCost(val)}
         onClose={() => setIsAdminDashboardOpen(false)} 
       />
 
@@ -452,9 +456,19 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
                 <div style={{ borderTop: '1px solid #eee', paddingTop: '2rem', marginTop: '2rem' }}>
                   {cartStep === 'cart' ? (
                     <>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
-                        <span style={{ fontWeight: 800 }}>TOTAL</span>
-                        <span style={{ fontWeight: 900, fontSize: '1.4rem' }}>{total} €</span>
+                      <div style={{ padding: '1.5rem', borderTop: '1px solid #eee', background: '#fafafa', borderRadius: '12px', marginTop: '2rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+                          <span style={{ color: '#666' }}>Sous-total</span>
+                          <span style={{ fontWeight: 600 }}>{subtotal.toFixed(2)} €</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginBottom: '1rem' }}>
+                          <span style={{ color: '#666' }}>Frais d'envoi</span>
+                          <span style={{ fontWeight: 600 }}>{shippingCost.toFixed(2)} €</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 900 }}>
+                          <span>TOTAL</span>
+                          <span>{total.toFixed(2)} €</span>
+                        </div>
                       </div>
                       <button 
                         onClick={() => setCartStep('checkout')}
