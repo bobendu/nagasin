@@ -61,8 +61,7 @@ if ($found) {
     
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: Nagasin Studio <na@dessinateur.net>" . "\r\n";
-    
+
     $htmlContent = "
     <html>
     <head>
@@ -73,7 +72,7 @@ if ($found) {
             .header { background: #004169; color: white; padding: 20px; text-align: center; }
             .content { padding: 30px; }
             .footer { font-size: 12px; color: #999; text-align: center; padding: 20px; }
-            .status-badge { background: #f0fdf4; color: #22c55e; padding: 5px 15px; borderRadius: 20px; fontWeight: bold; }
+            .status-badge { background: #f0fdf4; color: #22c55e; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
         </style>
     </head>
     <body>
@@ -84,23 +83,27 @@ if ($found) {
             <div class='content'>
                 <p>Bonjour " . $orderData['customer']['name'] . ",</p>
                 <p>" . $messageText . "</p>
-                <p><strong>Statut actuel :</strong> " . $newStatus . "</p>
-                <hr>
-                <p>Merci de votre confiance,<br>na!</p>
+                <p><strong>Statut actuel :</strong> <span class='status-badge'>" . $newStatus . "</span></p>
+                <hr style='border:none; border-top:1px solid #eee; margin:20px 0;'>
+                <p>Merci de votre confiance,<br><strong>na!</strong></p>
             </div>
             <div class='footer'>
-                Ceci est un email automatique pour la commande #" . $orderId . ".<br>
+                Ceci est un email automatique pour la commande #" . substr($orderId, -6) . ".<br>
                 Nagasin Studio - na@dessinateur.net
             </div>
         </div>
     </body>
     </html>
     ";
-    
-    // Note: mail() peut échouer selon la config OVH, mais c'est la base.
-    @mail($to, $subject, $htmlContent, $headers);
 
-    echo json_encode(["status" => "success", "newStatus" => $newStatus]);
+    $headers .= "From: Nagasin Studio <no-reply@nagasin.fr>" . "\r\n";
+    $headers .= "Reply-To: na@dessinateur.net" . "\r\n";
+    $headers .= "X-Mailer: PHP/" . phpversion();
+    
+    // Le 5ème paramètre -f est crucial chez certains hébergeurs comme OVH
+    $sent = @mail($to, $subject, $htmlContent, $headers, "-f no-reply@nagasin.fr");
+
+    echo json_encode(["status" => "success", "newStatus" => $newStatus, "mailSent" => $sent]);
 } else {
     echo json_encode(["error" => "Order not found"]);
 }
