@@ -180,7 +180,7 @@ export default function StoreApp({ isAdmin, onLogout, onGoToLogin }: { isAdmin?:
         </div>
 
         {/* SECTION CONTACT / INFOS (FIN DE PAGE) */}
-        <section style={{ borderTop: '1px solid #eee', marginTop: '6rem', padding: '4rem 0', textAlign: 'center' }}>
+        <section style={{ borderTop: '1px solid #eee', marginTop: '6rem', padding: '4rem 0 10rem 0', textAlign: 'center' }}>
           <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Contact & Projets</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
             Pour toute question sur votre commande ou un projet spécifique, n'hésitez pas à me contacter.
