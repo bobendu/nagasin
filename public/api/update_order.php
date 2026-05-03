@@ -61,7 +61,7 @@ if ($found) {
     
     $headers = "MIME-Version: 1.0\n";
     $headers .= "Content-type:text/html;charset=UTF-8\n";
-    $headers .= "From: Nagasin Studio <contact@nagasin.fr>\n";
+    $headers .= "From: contact@nagasin.fr\n";
     $headers .= "Reply-To: na@dessinateur.net\n";
     $headers .= "X-Mailer: PHP/" . phpversion();
 
