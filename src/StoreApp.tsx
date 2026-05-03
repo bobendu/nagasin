@@ -108,25 +108,7 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
         </div>
         
         <nav className="sidebar-nav" style={{ padding: '2rem 1.5rem' }}>
-          <button 
-            onClick={() => setIsCartOpen(true)}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '10px', 
-              fontSize: '0.85rem', 
-              fontWeight: 800,
-              border: 'none',
-              background: 'none',
-              padding: 0,
-              cursor: 'pointer',
-              textTransform: 'uppercase',
-              letterSpacing: '1px'
-            }}
-          >
-             <ShoppingCart size={18} strokeWidth={2} />
-             PANIER ({cart.length})
-          </button>
+          {/* L'accès au panier a été déplacé dans le bandeau du bas */}
         </nav>
 
         <div style={{ marginTop: 'auto', padding: '1.5rem', fontSize: '0.6rem', color: '#ccc', fontWeight: 700 }}>
@@ -305,6 +287,34 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
           </>
         )}
       </AnimatePresence>
+
+      {/* BANDEAU PANIER FIXE EN BAS */}
+      <div 
+        onClick={() => setIsCartOpen(true)}
+        style={{ 
+          position: 'fixed', 
+          bottom: 0, 
+          left: 0, 
+          right: 0, 
+          background: '#004369', 
+          color: 'white', 
+          padding: '1rem 2rem', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          gap: '15px', 
+          cursor: 'pointer', 
+          zIndex: 150,
+          boxShadow: '0 -5px 20px rgba(0,0,0,0.1)',
+          fontWeight: 900,
+          letterSpacing: '2px',
+          fontSize: '0.9rem',
+          textTransform: 'uppercase'
+        }}
+      >
+        <ShoppingCart size={20} strokeWidth={3} />
+        VOIR MON PANIER ({cart.length})
+      </div>
     </div>
   )
 }
