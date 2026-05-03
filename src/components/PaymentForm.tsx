@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js'
-import { motion } from 'framer-motion'
 import { Lock, AlertCircle, CheckCircle2 } from 'lucide-react'
 
 export default function PaymentForm({ total, onSuccess, onBack }: { total: number, onSuccess: (paymentId: string) => void, onBack: () => void }) {

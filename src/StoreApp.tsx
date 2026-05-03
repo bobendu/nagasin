@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { ShoppingCart, X, Trash2, ShoppingBag, PenLine, CreditCard, CheckCircle, Package } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { loadStripe } from '@stripe/stripe-js'
@@ -59,7 +60,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     }
   }, [isAdmin])
 
-  const total = cart.reduce((sum, item) => sum + item.price, 0)
+  const total = cart.reduce((sum: number, item: CartItem) => sum + item.price, 0)
 
   const addToCart = (item: Product | any) => {
     setCart([...cart, { ...item, dedication: item.dedication || '' }])
@@ -82,7 +83,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   }
 
   const handleUpdateProduct = (id: number, updates: Partial<Product>) => {
-    const newProducts = products.map(p => p.id === id ? { ...p, ...updates } : p)
+    const newProducts = products.map((p: Product) => p.id === id ? { ...p, ...updates } : p)
     setProducts(newProducts)
     localStorage.setItem('nagasin_catalog_draft', JSON.stringify(newProducts))
     setHasUnsavedChanges(true)
@@ -90,7 +91,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
 
   const handleDeleteProduct = (id: number) => {
     if (confirm("Supprimer ce produit ?")) {
-      const newProducts = products.filter(p => p.id !== id)
+      const newProducts = products.filter((p: Product) => p.id !== id)
       setProducts(newProducts)
       localStorage.setItem('nagasin_catalog_draft', JSON.stringify(newProducts))
       setHasUnsavedChanges(true)
@@ -214,7 +215,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
 
         {/* CATALOGUE */}
         <section id="catalogue" className="product-grid">
-          {products.map((item) => (
+          {products.map((item: Product) => (
             <EditableProductCard 
               key={item.id}
               product={item}
@@ -287,7 +288,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
                     {cartStep === 'cart' && (
                       /* ÉTAPE 1 : LISTE DES ARTICLES */
                       <>
-                        {cart.map((item, index) => (
+                        {cart.map((item: CartItem, index: number) => (
                           <div key={index} style={{ borderBottom: '1px solid #f9f9f9', paddingBottom: '1.5rem' }}>
                             <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', marginBottom: '1rem' }}>
                               <img src={item.image} style={{ width: '60px', height: '60px', objectFit: 'cover', background: '#f9f9f9' }} />
