@@ -14,7 +14,7 @@ import AdminToolbar from './components/admin/AdminToolbar'
 import AdminDashboard from './components/admin/AdminDashboard'
 import EditableProductCard from './components/admin/EditableProductCard'
 
-export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
+export default function StoreApp({ isAdmin, onLogout, onGoToLogin }: { isAdmin?: boolean, onLogout?: () => void, onGoToLogin?: () => void }) {
   const [products, setProducts] = useState<Product[]>([])
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [cart, setCart] = useState<CartItem[]>([])
@@ -121,6 +121,7 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
           onAddProduct={handleAddProduct}
           onPublish={handlePublish}
           hasChanges={hasUnsavedChanges}
+          onLogout={onLogout}
         />
       )}
 
@@ -179,14 +180,22 @@ export default function StoreApp({ isAdmin }: { isAdmin?: boolean }) {
         </div>
 
         {/* SECTION CONTACT / INFOS (FIN DE PAGE) */}
-        <section style={{ borderTop: '1px solid #eee', marginTop: '6rem', padding: '4rem 0' }}>
+        <section style={{ borderTop: '1px solid #eee', marginTop: '6rem', padding: '4rem 0', textAlign: 'center' }}>
           <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Contact & Projets</h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '500px', marginBottom: '2rem' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
             Pour toute question sur votre commande ou un projet spécifique, n'hésitez pas à me contacter.
           </p>
-          <a href="https://www.dessinateur.net/contact/" className="btn-cta" style={{ border: '1px solid #000', padding: '1rem 2.5rem' }}>
+          <a href="mailto:na@dessinateur.net" className="btn-cta" style={{ border: '1px solid #000', padding: '1rem 2.5rem' }}>
             Me contacter
           </a>
+          <div style={{ fontSize: '0.7rem', color: '#eee', marginTop: '4rem' }}>
+            © {new Date().getFullYear()} Nagasin - Art Prints by na! 
+            <span 
+              onClick={onGoToLogin}
+              style={{ cursor: 'default', opacity: 0.5, marginLeft: '5px' }}
+              title="Accès réservé"
+            >.</span>
+          </div>
         </section>
       </main>
 

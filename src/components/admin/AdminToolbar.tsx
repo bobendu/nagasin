@@ -71,6 +71,16 @@ export default function AdminToolbar({
       )}
 
       <button 
+        onClick={onLogout}
+        style={{ 
+          background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', 
+          display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 700 
+        }}
+      >
+        <Lock size={16} /> QUITTER
+      </button>
+
+      <button 
         style={{ 
           background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer'
         }}

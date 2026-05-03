@@ -73,7 +73,16 @@ function App() {
   }
 
   // --- STORE FRONT ---
-  return <StoreApp isAdmin={isLoggedIn} />
+  return (
+    <StoreApp 
+      isAdmin={isLoggedIn} 
+      onLogout={() => {
+        setIsLoggedIn(false)
+        setView('store')
+      }}
+      onGoToLogin={() => setView('login')}
+    />
+  )
 }
 
 export default App
