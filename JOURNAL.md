@@ -1,4 +1,6 @@
 # Journal du projet Nagasin
+> [!IMPORTANT]
+> **RÈGLE D'INTÉGRITÉ :** Ne jamais supprimer d'informations techniques ou de notes existantes dans ce journal. Les nouveaux ajouts se font à la suite.
 
 ## 2026-04-29 : Initialisation du projet
 - Création du projet avec Vite + React + TypeScript.
@@ -27,3 +29,21 @@
 - Ajout d'une texture de papier au fond du site.
 - Structuration du catalogue de livres avec des éléments de notation et des badges.
 - Basculement de `App.tsx` vers la boutique pour le développement local.
+## 2026-04-30 : L'Idée de Ouf - Le "Browser" de Tirages (Finalisé)
+- Création du composant `CustomPrintCard.tsx` avec navigateur intégré.
+- Implémentation du **"Magic Click"** : Sélection instantanée par clic sur le blog.
+- Ajout d'une barre de recherche thématique intégrée.
+- Refonte complète du **Backoffice (Admin)** : 
+    - Onglet **Commandes** avec détails clients et historique.
+    - Fonction **"Imprimer le dessin"** : Préparation automatique de l'image isolée pour impression.
+- Intégration du formulaire de livraison dans le tunnel d'achat.
+## 2026-05-03 : Architecture Admin Modulaire & WYSIWYG
+- **Révolution de l'Admin** : Passage d'un backoffice séparé à une expérience intégrée "Live Editor".
+- **Composants Modulaires** :
+    - `AdminToolbar` : Barre de commande flottante pour l'accès rapide.
+    - `AdminDashboard` : Overlay de pilotage avec KPIs (CA, Commandes, Clients).
+    - `EditableProductCard` : Système WYSIWYG pour éditer les produits directement sur la grille publique.
+- **Correctifs Responsivité** :
+    - Refonte complète de la page Maintenance pour mobile (Media Queries, layout adaptatif).
+    - Optimisation de la barre admin pour les petits écrans.
+- **Nettoyage** : Migration des styles inline vers `index.css` pour une meilleure maintenance.

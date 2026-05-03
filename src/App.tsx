@@ -7,7 +7,7 @@ import { Lock, Edit3 } from 'lucide-react'
 function App() {
   const isAdminPath = window.location.pathname.includes('nadmin') || window.location.search.includes('nadmin')
   
-  const [view, setView] = useState<'maintenance' | 'login' | 'admin' | 'store'>(isAdminPath ? 'login' : 'maintenance')
+  const [view, setView] = useState<'maintenance' | 'login' | 'admin' | 'store'>('store')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [password, setPassword] = useState('')
   const [user, setUser] = useState('')
@@ -31,23 +31,23 @@ function App() {
   // --- MAINTENANCE ---
   if (view === 'maintenance') {
     return (
-      <div style={{ height: '100vh', display: 'flex', background: '#e1f0ff' }}>
-        <aside style={{ width: '200px', background: 'white', display: 'flex', flexDirection: 'column', borderRight: '1px solid #f2f2f2' }}>
-           <img src="https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg" alt="na!" style={{ width: '100%' }} />
-           <div style={{ marginTop: 'auto', padding: '1.5rem', fontSize: '0.6rem', color: '#ccc', fontWeight: 700 }}>© 2026 NA! STUDIO</div>
+      <div className="maintenance-container">
+        <aside className="maintenance-sidebar">
+           <img src="https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg" alt="na!" />
+           <div className="maintenance-copyright">© 2026 NA! STUDIO</div>
         </aside>
-        <main style={{ flex: 1, display: 'flex', alignItems: 'center', padding: '4rem' }}>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-             <h4 style={{ color: '#004369', letterSpacing: '3px', fontSize: '0.8rem', fontWeight: 800, marginBottom: '1.5rem' }}>OFFICIEL</h4>
-             <h1 style={{ fontSize: '4.2rem', lineHeight: 1.1, marginBottom: '2rem' }}>LE NAGASIN <br />EST EN TRAVAUX.</h1>
-             <p style={{ fontSize: '1.2rem', color: '#666', maxWidth: '500px', lineHeight: 1.6 }}>
+        <main className="maintenance-main">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="maintenance-content">
+             <h4 className="maintenance-tag">OFFICIEL</h4>
+             <h1 className="maintenance-title">LE NAGASIN <br />EST EN TRAVAUX.</h1>
+             <p className="maintenance-desc">
                La boutique officielle de <strong>na!</strong> prépare ses rayons. <br />
                Revenez très bientôt pour découvrir les ouvrages et dessins originaux.
              </p>
-             <div style={{ marginTop: '3rem', height: '2px', background: '#004369', width: '60px' }}></div>
+             <div className="maintenance-divider"></div>
              
              {isLoggedIn && (
-               <button onClick={() => setView('admin')} style={{ marginTop: '4rem', display: 'flex', alignItems: 'center', gap: '10px', background: '#fffbeb', border: '1px solid #fbbf24', padding: '10px 20px', fontWeight: 800, cursor: 'pointer' }}>
+               <button onClick={() => setView('admin')} className="btn-resume-edit">
                  <Edit3 size={16} /> REPRENDRE L'ÉDITION
                </button>
              )}

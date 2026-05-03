@@ -9,10 +9,16 @@ interface CartItem extends Product {
   dedication?: string;
 }
 
+import CustomPrintCard from './components/CustomPrintCard'
+import AdminToolbar from './components/admin/AdminToolbar'
+import AdminDashboard from './components/admin/AdminDashboard'
+import EditableProductCard from './components/admin/EditableProductCard'
+
 export default function StoreApp({ isAdmin, onEdit }: { isAdmin?: boolean, onEdit?: () => void }) {
   const [products, setProducts] = useState<Product[]>([])
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('nagasin_catalog')
@@ -28,8 +34,8 @@ export default function StoreApp({ isAdmin, onEdit }: { isAdmin?: boolean, onEdi
 
   const total = cart.reduce((sum, item) => sum + item.price, 0)
 
-  const addToCart = (item: Product) => {
-    setCart([...cart, { ...item, dedication: '' }])
+  const addToCart = (item: Product | any) => {
+    setCart([...cart, { ...item, dedication: item.dedication || '' }])
     setIsCartOpen(true)
   }
 
@@ -45,8 +51,53 @@ export default function StoreApp({ isAdmin, onEdit }: { isAdmin?: boolean, onEdi
     setCart(newCart)
   }
 
+  const handleUpdateProduct = (id: number, updates: Partial<Product>) => {
+    const newProducts = products.map(p => p.id === id ? { ...p, ...updates } : p)
+    setProducts(newProducts)
+    localStorage.setItem('nagasin_catalog', JSON.stringify(newProducts))
+  }
+
+  const handleDeleteProduct = (id: number) => {
+    if (confirm("Supprimer cet article ?")) {
+      const newProducts = products.filter(p => p.id !== id)
+      setProducts(newProducts)
+      localStorage.setItem('nagasin_catalog', JSON.stringify(newProducts))
+    }
+  }
+
+  const handleAddProduct = () => {
+    const newProduct: Product = {
+      id: Date.now(),
+      slug: 'nouveau-produit-' + Date.now(),
+      title: 'Nouveau Produit',
+      category: 'EDITION',
+      price: 0,
+      description: 'Description à compléter...',
+      details: '',
+      image: 'https://via.placeholder.com/400',
+      canBeDedicated: true,
+      stock: 0,
+      weight: 0
+    }
+    const newProducts = [newProduct, ...products]
+    setProducts(newProducts)
+    localStorage.setItem('nagasin_catalog', JSON.stringify(newProducts))
+  }
+
   return (
     <div className="app-layout">
+      {isAdmin && (
+        <AdminToolbar 
+          onOpenDashboard={() => setIsAdminDashboardOpen(true)} 
+          onAddProduct={handleAddProduct}
+        />
+      )}
+
+      <AdminDashboard 
+        isOpen={isAdminDashboardOpen} 
+        onClose={() => setIsAdminDashboardOpen(false)} 
+      />
+
       {/* SIDEBAR MINIMALISTE */}
       <aside className="sidebar">
         <div className="sidebar-logo">
@@ -95,40 +146,22 @@ export default function StoreApp({ isAdmin, onEdit }: { isAdmin?: boolean, onEdi
           </motion.div>
         </header>
 
+        {/* PRODUIT INTERACTIF (TON IDÉE DE OUF) */}
+        <div style={{ marginBottom: '5rem' }}>
+          <CustomPrintCard onAddToCart={addToCart} />
+        </div>
+
         {/* CATALOGUE */}
         <section id="catalogue" className="product-grid">
           {products.map((item) => (
-            <div key={item.id} className="item-card-clean" style={{ paddingBottom: '3rem' }}>
-              <div className="image-container">
-                <img src={item.image} alt={item.title} />
-              </div>
-              <div>
-                <h3 style={{ fontSize: '1.6rem', margin: '0.5rem 0 1rem' }}>{item.title}</h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.5', maxWidth: '400px' }}>
-                  {item.description}
-                </p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 900, fontSize: '1.3rem' }}>{item.price} €</span>
-                  <button className="btn-cta" onClick={() => addToCart(item)}>
-                    ACHETER <ArrowRight size={16} />
-                  </button>
-                </div>
-
-                {isAdmin && (
-                  <button 
-                    onClick={onEdit}
-                    style={{ 
-                      marginTop: '1.5rem', width: '100%', padding: '10px', 
-                      background: '#fffbeb', border: '1px solid #fbbf24', 
-                      color: '#92400e', fontWeight: 800, fontSize: '0.75rem', 
-                      cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' 
-                    }}
-                  >
-                    <PenLine size={14} /> ÉDITER CET ARTICLE
-                  </button>
-                )}
-              </div>
-            </div>
+            <EditableProductCard 
+              key={item.id}
+              product={item}
+              isAdmin={!!isAdmin}
+              onAddToCart={addToCart}
+              onUpdate={handleUpdateProduct}
+              onDelete={handleDeleteProduct}
+            />
           ))}
         </section>
 
@@ -198,7 +231,7 @@ export default function StoreApp({ isAdmin, onEdit }: { isAdmin?: boolean, onEdi
                               <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--primary-color)' }}>DÉDICACE PERSONNALISÉE</span>
                             </div>
                             <textarea 
-                              placeholder="À qui dois-je dédicacer ce livre ?"
+                              placeholder="À qui dois-je dédicacer ce tirage ?"
                               value={item.dedication}
                               onChange={(e) => updateDedication(index, e.target.value)}
                               style={{ 
@@ -211,6 +244,16 @@ export default function StoreApp({ isAdmin, onEdit }: { isAdmin?: boolean, onEdi
                         )}
                       </div>
                     ))}
+
+                    {/* FORMULAIRE CLIENT */}
+                    <div style={{ marginTop: '1rem', padding: '1.5rem', background: '#f9f9f9', borderRadius: '12px' }}>
+                      <h4 style={{ fontSize: '0.8rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '1px' }}>INFOS DE LIVRAISON</h4>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <input type="text" placeholder="Nom Complet" id="cust-name" style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} />
+                        <input type="email" placeholder="Email" id="cust-email" style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} />
+                        <textarea placeholder="Adresse de livraison complète" id="cust-addr" style={{ padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem', resize: 'none' }} rows={3} />
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -221,11 +264,40 @@ export default function StoreApp({ isAdmin, onEdit }: { isAdmin?: boolean, onEdi
                     <span style={{ fontWeight: 800 }}>TOTAL</span>
                     <span style={{ fontWeight: 900, fontSize: '1.4rem' }}>{total} €</span>
                   </div>
-                  <button style={{ 
-                    width: '100%', background: 'var(--primary-color)', color: 'white', 
-                    padding: '1.2rem', border: 'none', fontWeight: 900, letterSpacing: '2px' 
-                  }}>
-                    PASSER À LA CAISSE
+                  <button 
+                    onClick={() => {
+                      const name = (document.getElementById('cust-name') as HTMLInputElement)?.value;
+                      const email = (document.getElementById('cust-email') as HTMLInputElement)?.value;
+                      const addr = (document.getElementById('cust-addr') as HTMLTextAreaElement)?.value;
+                      
+                      if (!name || !addr) {
+                        alert("Merci de remplir vos infos de livraison.");
+                        return;
+                      }
+
+                      const order = {
+                        id: Date.now(),
+                        date: new Date().toISOString(),
+                        customer: { name, email, addr },
+                        items: cart,
+                        total,
+                        status: 'En attente'
+                      };
+
+                      const existingOrders = JSON.parse(localStorage.getItem('nagasin_orders') || '[]');
+                      localStorage.setItem('nagasin_orders', JSON.stringify([order, ...existingOrders]));
+                      
+                      alert("Commande enregistrée ! (Simulation)");
+                      setCart([]);
+                      setIsCartOpen(false);
+                    }}
+                    style={{ 
+                      width: '100%', background: 'var(--primary-color)', color: 'white', 
+                      padding: '1.2rem', border: 'none', fontWeight: 900, letterSpacing: '2px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    CONFIRMER LA COMMANDE
                   </button>
                 </div>
               )}
