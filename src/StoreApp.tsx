@@ -188,7 +188,7 @@ export default function StoreApp({ isAdmin, onLogout, onGoToLogin }: { isAdmin?:
           <a href="mailto:na@dessinateur.net" className="btn-cta" style={{ border: '1px solid #000', padding: '1rem 2.5rem' }}>
             Me contacter
           </a>
-          <div style={{ fontSize: '0.7rem', color: '#eee', marginTop: '4rem' }}>
+          <div style={{ fontSize: '0.7rem', color: '#999', marginTop: '4rem' }}>
             © {new Date().getFullYear()} Nagasin - Art Prints by na! 
             <span 
               onClick={onGoToLogin}
