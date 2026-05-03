@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, TrendingUp, ShoppingBag, Users, Euro, Calendar, Printer, User, Mail, MapPin, CreditCard, Truck, Settings } from 'lucide-react'
+import { X, TrendingUp, ShoppingBag, Users, Euro, Calendar, Printer, User, Mail, MapPin, CreditCard, Truck, Settings, CheckCircle2, Package, Send } from 'lucide-react'
 
 interface Order {
   id: number;
@@ -22,38 +22,64 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(false)
   const [isEditingSettings, setIsEditingSettings] = useState(false)
+  const [updatingId, setUpdatingId] = useState<number | null>(null)
   
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const fetchOrders = async () => {
-      setLoading(true)
-      try {
-        const response = await fetch('/api/get_orders.php', {
-          headers: {
-            'X-Admin-Password': adminToken || ''
-          }
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setOrders(data);
-        } else {
-          throw new Error('Unauthorized or Server Error');
+  const fetchOrders = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch('/api/get_orders.php', {
+        headers: {
+          'X-Admin-Password': adminToken || ''
         }
-      } catch (err) {
-        console.warn("API indisponible, lecture LocalStorage (Fallback dev).", err);
-        const savedOrders = localStorage.getItem('nagasin_orders')
-        if (savedOrders) {
-          setOrders(JSON.parse(savedOrders))
-        }
-      } finally {
-        setLoading(false)
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setOrders(data);
+      } else {
+        throw new Error('Unauthorized or Server Error');
       }
-    };
+    } catch (err) {
+      console.warn("API indisponible, lecture LocalStorage (Fallback dev).", err);
+      const savedOrders = localStorage.getItem('nagasin_orders')
+      if (savedOrders) {
+        setOrders(JSON.parse(savedOrders))
+      }
+    } finally {
+      setLoading(false)
+    }
+  };
 
-    fetchOrders();
+  useEffect(() => {
+    if (isOpen) fetchOrders();
   }, [isOpen, adminToken])
+
+  const updateStatus = async (orderId: number, newStatus: string) => {
+    setUpdatingId(orderId)
+    try {
+      const response = await fetch('/api/update_order.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Password': adminToken || ''
+        },
+        body: JSON.stringify({ id: orderId, status: newStatus })
+      });
+      
+      if (response.ok) {
+        // Mettre à jour localement la liste
+        setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+      } else {
+        alert("Erreur lors de la mise à jour du statut.");
+      }
+    } catch (err) {
+      console.error(err);
+      // Fallback local dev
+      setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+    } finally {
+      setUpdatingId(null)
+    }
+  }
 
   const stats = {
     revenue: orders.reduce((sum, o) => sum + o.total, 0),
@@ -63,7 +89,6 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
   }
 
   const printImage = (url: string) => {
-    // Validation basique de l'URL pour éviter l'injection de scripts
     try {
       const sanitizedUrl = new URL(url).toString();
       const win = window.open('', '_blank')
@@ -191,7 +216,7 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
                 </div>
               ) : (
                 orders.map((o) => (
-                  <div key={o.id} style={{ background: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden' }}>
+                  <div key={o.id} style={{ background: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden', opacity: updatingId === o.id ? 0.6 : 1 }}>
                     <div style={{ padding: '1.5rem 2rem', background: '#fafafa', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
                          <div><span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#999', display: 'block' }}>RÉFÉRENCE</span><span style={{ fontWeight: 800 }}>#{o.id.toString().slice(-6)}</span></div>
@@ -206,21 +231,33 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
                             </div>
                          )}
                        </div>
-                       <div style={{ textAlign: 'right' }}>
+                       <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
                          <span style={{ fontSize: '1.1rem', fontWeight: 900 }}>{o.total.toFixed(2)} €</span>
-                         <div style={{ 
-                            fontSize: '0.65rem', 
-                            fontWeight: 900, 
-                            color: o.status === 'Payée' ? '#22c55e' : '#f59e0b',
-                            background: o.status === 'Payée' ? '#f0fdf4' : '#fffbeb',
-                            padding: '4px 10px',
-                            borderRadius: '20px',
-                            marginTop: '4px',
-                            display: 'inline-block',
-                            border: `1px solid ${o.status === 'Payée' ? '#bbf7d0' : '#fef3c7'}`
-                          }}>
-                            {o.status.toUpperCase()}
-                          </div>
+                         
+                         {/* SELECTEUR DE STATUT */}
+                         <div style={{ display: 'flex', gap: '5px' }}>
+                           <StatusButton 
+                            active={o.status === 'Payée'} 
+                            color="#22c55e" 
+                            icon={<CheckCircle2 size={12} />} 
+                            label="Payée" 
+                            onClick={() => updateStatus(o.id, 'Payée')} 
+                           />
+                           <StatusButton 
+                            active={o.status === 'En préparation'} 
+                            color="#f59e0b" 
+                            icon={<Package size={12} />} 
+                            label="Préparation" 
+                            onClick={() => updateStatus(o.id, 'En préparation')} 
+                           />
+                           <StatusButton 
+                            active={o.status === 'Expédiée'} 
+                            color="#3b82f6" 
+                            icon={<Send size={12} />} 
+                            label="Expédiée" 
+                            onClick={() => updateStatus(o.id, 'Expédiée')} 
+                           />
+                         </div>
                        </div>
                     </div>
                     
@@ -260,6 +297,31 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
         </motion.div>
       )}
     </AnimatePresence>
+  )
+}
+
+function StatusButton({ active, color, icon, label, onClick }: { active: boolean, color: string, icon: any, label: string, onClick: () => void }) {
+  return (
+    <button 
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '4px',
+        fontSize: '0.6rem',
+        fontWeight: 800,
+        padding: '4px 8px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        border: '1px solid',
+        borderColor: active ? color : '#eee',
+        background: active ? color : 'transparent',
+        color: active ? 'white' : '#999',
+        transition: 'all 0.2s'
+      }}
+    >
+      {icon} {label.toUpperCase()}
+    </button>
   )
 }
 
