@@ -1,20 +1,15 @@
 # Règles du projet Nagasin
 
 ## Identité Visuelle
-- **Aesthétique** : Premium, Minimaliste, High-Tech.
-- **Palette** : Fond sombre (`#050505`), Accents Cyan (`#00e5ff`) et Or (`#ffd700`).
-- **Composants** : Utiliser le glassmorphism (`backdrop-filter: blur`).
+- **Aesthétique** : Studio na! / Art Gallery (Style dessinateur.net).
+- **Palette** : Fond blanc/papier, Accents Bleu Logo (**#004169**), Gris Anthracite.
+- **Composants** : **Coins carrés (0px)** obligatoires pour tout élément corporate/admin.
+- **Typographie** : "Outfit" pour les titres, sans-serif propre pour le corps.
 
-## Architecture
-- **Framework** : React (Vite).
-- **Styles** : Vanilla CSS privilégié pour la performance et le contrôle total.
-- **Icônes** : Lucide React.
-- **Animations** : Framer Motion pour toutes les transitions fluides.
-
-## Workflow
-- Maintenir ce fichier `RULES.md` et le `JOURNAL.md` à jour à chaque étape majeure.
-- Toutes les nouvelles fonctionnalités doivent être documentées dans le journal.
-- **INTERDICTION de supprimer** des notes ou données techniques du journal (Ajouts uniquement).
+## Architecture & Data
+- **Édition** : Full WYSIWYG (Édition directe sans clic préalable).
+- **Validation** : Système obligatoire de **Brouillon (Draft)**. Tout changement doit être validé via le bouton "PUBLIER" pour être live.
+- **Persistance** : Utilisation de `localStorage` (`nagasin_catalog` pour le public, `nagasin_catalog_draft` pour l'admin).
 
 ## 🔐 Accès Techniques
 - **GitHub** : `bobendu` / `benoit.baudu@free.fr` / `Z0b1-Hu8`

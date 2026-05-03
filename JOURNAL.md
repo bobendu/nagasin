@@ -47,3 +47,13 @@
     - Refonte complète de la page Maintenance pour mobile (Media Queries, layout adaptatif).
     - Optimisation de la barre admin pour les petits écrans.
 - **Nettoyage** : Migration des styles inline vers `index.css` pour une meilleure maintenance.
+- **Identité Visuelle** : Standardisation sur le bleu logo exact `#004169` et suppression des arrondis (Coins carrés `0px`).
+
+## 2026-05-03 : Version 1.2 - Full WYSIWYG & Sécurité de Publication
+- **Édition Directe (Full WYSIWYG)** : Suppression de l'étape intermédiaire "Éditer". Les produits sont désormais des formulaires de saisie directe dès que le mode admin est actif.
+- **Système de Brouillon (Draft)** :
+    - Les modifications sont sauvegardées en local (`catalog_draft`).
+    - Ajout d'un bouton **PUBLIER** dans la toolbar pour valider les changements et les rendre visibles aux clients.
+- **Optimisation Panier** : Déplacement de l'accès panier vers un bandeau fixe (Sticky) en bas de page pour améliorer le taux de conversion.
+- **Passage Secret** : Ajout d'un lien discret sur le point final du copyright pour accéder à l'administration sans URL visible.
+- **Responsivité Avancée** : Refonte du `CustomPrintCard` pour un affichage parfait sur mobile (empilement vertical et zones de texte extensibles).
