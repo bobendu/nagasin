@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, TrendingUp, ShoppingBag, Users, Euro, Calendar, Printer, User, Mail, MapPin, CreditCard, Truck, Settings, CheckCircle2, Package, Send } from 'lucide-react'
+import { X, TrendingUp, ShoppingBag, Users, Euro, Calendar, Printer, User, Mail, MapPin, CreditCard, Truck, Settings, CheckCircle2, Package, Send, AlertCircle } from 'lucide-react'
 
 interface Order {
   id: number;
@@ -23,6 +23,7 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
   const [loading, setLoading] = useState(false)
   const [isEditingSettings, setIsEditingSettings] = useState(false)
   const [updatingId, setUpdatingId] = useState<number | null>(null)
+  const [pendingChange, setPendingChange] = useState<{ id: number, status: string, customer: string } | null>(null)
   
   const fetchOrders = async () => {
     setLoading(true)
@@ -54,8 +55,13 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
     if (isOpen) fetchOrders();
   }, [isOpen, adminToken])
 
-  const updateStatus = async (orderId: number, newStatus: string) => {
-    setUpdatingId(orderId)
+  const confirmStatusUpdate = async () => {
+    if (!pendingChange) return;
+    const { id, status } = pendingChange;
+    
+    setUpdatingId(id)
+    setPendingChange(null)
+    
     try {
       const response = await fetch('/api/update_order.php', {
         method: 'POST',
@@ -63,19 +69,17 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
           'Content-Type': 'application/json',
           'X-Admin-Password': adminToken || ''
         },
-        body: JSON.stringify({ id: orderId, status: newStatus })
+        body: JSON.stringify({ id, status })
       });
       
       if (response.ok) {
-        // Mettre à jour localement la liste
-        setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+        setOrders(orders.map(o => o.id === id ? { ...o, status } : o));
       } else {
         alert("Erreur lors de la mise à jour du statut.");
       }
     } catch (err) {
       console.error(err);
-      // Fallback local dev
-      setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+      setOrders(orders.map(o => o.id === id ? { ...o, status } : o));
     } finally {
       setUpdatingId(null)
     }
@@ -134,6 +138,45 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
             border: '1px solid rgba(0,0,0,0.05)'
           }}
         >
+          {/* CONFIRMATION MODAL */}
+          <AnimatePresence>
+            {pendingChange && (
+              <motion.div 
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}
+              >
+                <motion.div 
+                  initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }}
+                  style={{ background: 'white', padding: '2.5rem', borderRadius: '20px', maxWidth: '450px', width: '100%', textAlign: 'center', boxShadow: '0 30px 60px rgba(0,0,0,0.2)' }}
+                >
+                  <div style={{ background: '#fff9db', color: '#f08c00', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                    <AlertCircle size={32} />
+                  </div>
+                  <h3 style={{ margin: '0 0 1rem', fontWeight: 900 }}>Confirmer le changement ?</h3>
+                  <p style={{ fontSize: '0.9rem', color: '#666', lineHeight: 1.5, marginBottom: '2rem' }}>
+                    Vous allez passer la commande de <strong>{pendingChange.customer}</strong> au statut <span style={{ fontWeight: 800, color: '#000' }}>"{pendingChange.status}"</span>. 
+                    <br/><br/>
+                    Un email de notification sera automatiquement envoyé au client.
+                  </p>
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button 
+                      onClick={() => setPendingChange(null)}
+                      style={{ flex: 1, padding: '12px', borderRadius: '12px', border: '1px solid #eee', background: 'white', fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      ANNULER
+                    </button>
+                    <button 
+                      onClick={confirmStatusUpdate}
+                      style={{ flex: 1, padding: '12px', borderRadius: '12px', border: 'none', background: '#000', color: 'white', fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      CONFIRMER
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* HEADER */}
           <div style={{ padding: '2rem 3rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
@@ -234,28 +277,27 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
                        <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
                          <span style={{ fontSize: '1.1rem', fontWeight: 900 }}>{o.total.toFixed(2)} €</span>
                          
-                         {/* SELECTEUR DE STATUT */}
                          <div style={{ display: 'flex', gap: '5px' }}>
                            <StatusButton 
                             active={o.status === 'Payée'} 
                             color="#22c55e" 
                             icon={<CheckCircle2 size={12} />} 
                             label="Payée" 
-                            onClick={() => updateStatus(o.id, 'Payée')} 
+                            onClick={() => setPendingChange({ id: o.id, status: 'Payée', customer: o.customer.name })} 
                            />
                            <StatusButton 
                             active={o.status === 'En préparation'} 
                             color="#f59e0b" 
                             icon={<Package size={12} />} 
                             label="Préparation" 
-                            onClick={() => updateStatus(o.id, 'En préparation')} 
+                            onClick={() => setPendingChange({ id: o.id, status: 'En préparation', customer: o.customer.name })} 
                            />
                            <StatusButton 
                             active={o.status === 'Expédiée'} 
                             color="#3b82f6" 
                             icon={<Send size={12} />} 
                             label="Expédiée" 
-                            onClick={() => updateStatus(o.id, 'Expédiée')} 
+                            onClick={() => setPendingChange({ id: o.id, status: 'Expédiée', customer: o.customer.name })} 
                            />
                          </div>
                        </div>
@@ -303,7 +345,7 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
 function StatusButton({ active, color, icon, label, onClick }: { active: boolean, color: string, icon: any, label: string, onClick: () => void }) {
   return (
     <button 
-      onClick={onClick}
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
       style={{
         display: 'flex',
         alignItems: 'center',
