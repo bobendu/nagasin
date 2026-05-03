@@ -9,7 +9,7 @@ function App() {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState('')
 
-  const [secretClicks, setSecretClicks] = useState(0)
+  const [, setSecretClicks] = useState(0)
 
   useEffect(() => {
     if (window.location.pathname.includes('nadmin') || window.location.search.includes('nadmin')) {
