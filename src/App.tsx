@@ -9,11 +9,24 @@ function App() {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState('')
 
+  const [secretClicks, setSecretClicks] = useState(0)
+
   useEffect(() => {
     if (window.location.pathname.includes('nadmin') || window.location.search.includes('nadmin')) {
       if (!isLoggedIn) setView('login')
     }
   }, [isLoggedIn])
+
+  const handleSecretClick = () => {
+    setSecretClicks(prev => {
+      const next = prev + 1
+      if (next >= 5) {
+        setView('store')
+        return 0
+      }
+      return next
+    })
+  }
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,7 +43,12 @@ function App() {
     return (
       <div className="maintenance-container">
         <aside className="maintenance-sidebar">
-           <img src="https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg" alt="na!" />
+           <img 
+            src="https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg" 
+            alt="na!" 
+            onClick={handleSecretClick}
+            style={{ cursor: 'default' }}
+           />
            <div className="maintenance-copyright">© 2026 NA! STUDIO</div>
         </aside>
         <main className="maintenance-main">

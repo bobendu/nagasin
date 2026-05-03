@@ -57,3 +57,4 @@
 - **Optimisation Panier** : Déplacement de l'accès panier vers un bandeau fixe (Sticky) en bas de page pour améliorer le taux de conversion.
 - **Passage Secret** : Ajout d'un lien discret sur le point final du copyright pour accéder à l'administration sans URL visible.
 - **Responsivité Avancée** : Refonte du `CustomPrintCard` pour un affichage parfait sur mobile (empilement vertical et zones de texte extensibles).
+- **Passage Secret (Amélioration)** : Implémentation d'un déclencheur sur le logo (5 clics) pour accéder à la boutique sans lever le mode maintenance public.
