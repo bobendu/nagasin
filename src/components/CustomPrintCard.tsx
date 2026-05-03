@@ -161,7 +161,7 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
         </div>
       </div>
 
-      <div style={{ display: 'flex', height: '650px', background: '#fff' }}>
+      <div className="custom-print-body" style={{ display: 'flex', minHeight: '600px', background: '#fff' }}>
         {/* IFRAME */}
         <div style={{ flex: 3, position: 'relative', borderRight: '1px solid #f1f3f5' }}>
           <iframe 
@@ -173,8 +173,8 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
         </div>
 
         {/* CONTROLES */}
-        <div style={{ flex: 1.2, padding: '1.2rem', display: 'flex', flexDirection: 'column', gap: '1rem', background: '#fcfcfc', overflow: 'hidden' }}>
-          <div>
+        <div style={{ flex: 1.2, padding: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem', background: '#fcfcfc', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', flex: 1 }}>
             {isAdmin ? (
               <input 
                 value={customTitle} 
@@ -215,7 +215,7 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
                 style={{ 
                   fontSize: '0.8rem', color: '#666', lineHeight: 1.5, margin: 0,
                   width: '100%', border: 'none', borderBottom: '1px dashed #004169', 
-                  outline: 'none', background: 'transparent', resize: 'none', minHeight: '60px'
+                  outline: 'none', background: 'transparent', resize: 'none', flex: 1
                 }}
               />
             ) : (
@@ -296,7 +296,19 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
           </div>
         </div>
       </div>
-
+      <style>{`
+        @media (max-width: 900px) {
+          .custom-print-body {
+            flex-direction: column !important;
+            height: auto !important;
+          }
+          .custom-print-body > div {
+            width: 100% !important;
+            flex: none !important;
+            min-height: 400px;
+          }
+        }
+      `}</style>
     </motion.div>
   )
 }
