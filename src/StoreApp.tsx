@@ -43,8 +43,9 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     const loadCatalog = async () => {
       if (isAdmin && draftCatalog) {
         const draft = JSON.parse(draftCatalog)
-        setProducts(draft.products || draft) // Support old format
+        setProducts(draft.products || draft)
         if (draft.customPrintSettings) setCustomPrintSettings(draft.customPrintSettings)
+        if (draft.shippingCost !== undefined) setShippingCost(draft.shippingCost)
         setHasUnsavedChanges(true)
       } else {
         try {
@@ -54,6 +55,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
             if (data.products) {
               setProducts(data.products);
               if (data.customPrintSettings) setCustomPrintSettings(data.customPrintSettings);
+              if (data.shippingCost !== undefined) setShippingCost(data.shippingCost);
             } else {
               setProducts(data);
             }
@@ -118,17 +120,27 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   const handleUpdateProduct = (id: number, updates: Partial<Product>) => {
     const newProducts = products.map((p) => p.id === id ? { ...p, ...updates } : p)
     setProducts(newProducts)
-    saveDraft(newProducts, customPrintSettings)
+    saveDraft(newProducts, customPrintSettings, shippingCost)
     setHasUnsavedChanges(true)
   }
 
-  const saveDraft = (p: Product[], s: any) => {
-    localStorage.setItem('nagasin_catalog_draft', JSON.stringify({ products: p, customPrintSettings: s }))
+  const saveDraft = (p: Product[], s: any, sc: number) => {
+    localStorage.setItem('nagasin_catalog_draft', JSON.stringify({ 
+      products: p, 
+      customPrintSettings: s,
+      shippingCost: sc 
+    }))
   }
 
   const handleUpdateCustomPrint = (settings: any) => {
     setCustomPrintSettings(settings)
-    saveDraft(products, settings)
+    saveDraft(products, settings, shippingCost)
+    setHasUnsavedChanges(true)
+  }
+
+  const handleUpdateShipping = (val: number) => {
+    setShippingCost(val)
+    saveDraft(products, customPrintSettings, val)
     setHasUnsavedChanges(true)
   }
 
@@ -169,7 +181,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
           'Content-Type': 'application/json',
           'X-Admin-Password': adminToken || ''
         },
-        body: JSON.stringify({ products, customPrintSettings })
+        body: JSON.stringify({ products, customPrintSettings, shippingCost })
       });
       if (!response.ok) throw new Error('Erreur publication');
       localStorage.removeItem('nagasin_catalog_draft')
@@ -301,7 +313,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
         isOpen={isAdminDashboardOpen} 
         adminToken={adminToken}
         shippingCost={shippingCost}
-        onUpdateShipping={setShippingCost}
+        onUpdateShipping={handleUpdateShipping}
         onClose={() => setIsAdminDashboardOpen(false)} 
       />
 
