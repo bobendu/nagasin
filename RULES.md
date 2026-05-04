@@ -22,3 +22,6 @@
 ## 🔐 Accès Techniques
 - **GitHub** : `bobendu` / `benoit.baudu@free.fr` / `Z0b1-Hu8`
 - **Blog Admin** : `dessinateur.biz/blog` / `i2w!aB%q3KkavEo8`
+
+## 💎 Préceptes de Développement (Crucial)
+- **Non-Régression Absolue** : Pour chaque nouvel ajustement ou correctif, il est impératif de veiller à ne JAMAIS détruire ce qui est déjà en place et fonctionnel. Toute modification doit respecter l'intégrité technique et visuelle des fonctionnalités existantes.

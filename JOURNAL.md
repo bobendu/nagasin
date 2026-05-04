@@ -123,3 +123,4 @@
 - **Architecture Hybride** : Conservation de la structure modulaire (dispatching du code en fichiers séparés) tout en retrouvant la richesse fonctionnelle de la version précédente.
 - **Consolidation des Types** : Mise à jour de l'interface `Product` centrale pour supporter tous les champs métiers (`stock`, `canBeDedicated`, `weight`, `slug`).
 - **Paiement & Suivi** : Synchronisation du `paymentId` Stripe dans l'objet de commande et ajout d'un système de persistance locale de secours en cas d'indisponibilité de l'API.
+- **Principe de Non-Régression** : Adoption du précepte "Ne pas détruire ce qui fonctionne" comme règle d'or pour tout développement futur, consigné dans la Bible (`RULES.md`).
