@@ -4,7 +4,7 @@ export interface Product {
   title: string;
   price: number;
   image: string;
-  category?: string;
+  category?: "EDITION" | "COLLECTION" | "DESSIN" | "ORIGINAL" | "AUTRE" | "SPECIAL";
   description: string;
   details?: string;
   canBeDedicated?: boolean;
