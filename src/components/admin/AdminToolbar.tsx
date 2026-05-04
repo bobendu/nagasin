@@ -4,12 +4,14 @@ export default function AdminToolbar({
   onOpenDashboard, 
   onAddProduct, 
   onPublish, 
+  onResetDraft,
   hasChanges,
   onLogout
 }: { 
   onOpenDashboard: () => void, 
   onAddProduct: () => void,
   onPublish: () => void,
+  onResetDraft: () => void,
   hasChanges: boolean,
   onLogout?: () => void
 }) {
@@ -76,6 +78,18 @@ export default function AdminToolbar({
         <CheckCircle size={16} /> 
         {hasChanges ? 'PUBLIER LES CHANGEMENTS' : 'DÉJÀ PUBLIÉ'}
       </button>
+
+      {hasChanges && (
+        <button 
+          onClick={onResetDraft}
+          style={{ 
+            background: 'none', border: '1px solid #ff4444', color: '#ff4444', cursor: 'pointer', 
+            padding: '8px 15px', borderRadius: '0', fontSize: '0.7rem', fontWeight: 700 
+          }}
+        >
+          ANNULER BROUILLON
+        </button>
+      )}
 
       <button 
         onClick={onLogout}

@@ -32,12 +32,19 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({ 
     firstName: '', lastName: '', email: '', emailConfirm: '', address: '', zipCode: '', city: '' 
   })
+  const [customPrintSettings, setCustomPrintSettings] = useState({
+    title: 'Tirage sous cadre',
+    price: 45,
+    description: "Choisissez votre illustration préférée sur le blog (scrollez et cliquez) ou par mot clé ; je vous l'imprime, vous la mets sous cadre et je vous l'expédie."
+  })
 
   useEffect(() => {
     const draftCatalog = localStorage.getItem('nagasin_catalog_draft')
     const loadCatalog = async () => {
       if (isAdmin && draftCatalog) {
-        setProducts(JSON.parse(draftCatalog))
+        const draft = JSON.parse(draftCatalog)
+        setProducts(draft.products || draft) // Support old format
+        if (draft.customPrintSettings) setCustomPrintSettings(draft.customPrintSettings)
         setHasUnsavedChanges(true)
       } else {
         try {
@@ -106,7 +113,17 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   const handleUpdateProduct = (id: number, updates: Partial<Product>) => {
     const newProducts = products.map((p) => p.id === id ? { ...p, ...updates } : p)
     setProducts(newProducts)
-    localStorage.setItem('nagasin_catalog_draft', JSON.stringify(newProducts))
+    saveDraft(newProducts, customPrintSettings)
+    setHasUnsavedChanges(true)
+  }
+
+  const saveDraft = (p: Product[], s: any) => {
+    localStorage.setItem('nagasin_catalog_draft', JSON.stringify({ products: p, customPrintSettings: s }))
+  }
+
+  const handleUpdateCustomPrint = (settings: any) => {
+    setCustomPrintSettings(settings)
+    saveDraft(products, settings)
     setHasUnsavedChanges(true)
   }
 
@@ -147,7 +164,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
           'Content-Type': 'application/json',
           'X-Admin-Password': adminToken || ''
         },
-        body: JSON.stringify(products)
+        body: JSON.stringify({ products, customPrintSettings })
       });
       if (!response.ok) throw new Error('Erreur publication');
       localStorage.removeItem('nagasin_catalog_draft')
@@ -156,6 +173,13 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     } catch (err) {
       alert("Erreur lors de la publication.");
       console.error(err);
+    }
+  }
+
+  const handleResetDraft = () => {
+    if (confirm("Supprimer tous les changements non publiés ?")) {
+      localStorage.removeItem('nagasin_catalog_draft')
+      window.location.reload()
     }
   }
 
@@ -169,6 +193,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
           onOpenDashboard={() => setIsAdminDashboardOpen(true)} 
           onAddProduct={handleAddProduct}
           onPublish={handlePublish}
+          onResetDraft={handleResetDraft}
           hasChanges={hasUnsavedChanges}
           onLogout={onLogout}
         />
@@ -238,7 +263,12 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
 
         {/* PRODUIT INTERACTIF */}
         <div style={{ marginTop: '5rem', marginBottom: '5rem' }}>
-          <CustomPrintCard onAddToCart={addToCart} isAdmin={!!isAdmin} />
+          <CustomPrintCard 
+            onAddToCart={addToCart} 
+            isAdmin={!!isAdmin} 
+            settings={customPrintSettings}
+            onUpdateSettings={handleUpdateCustomPrint}
+          />
         </div>
 
         {/* SECTION CONTACT */}

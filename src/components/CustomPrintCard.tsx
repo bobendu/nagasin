@@ -5,9 +5,11 @@ import { ExternalLink, ShoppingCart, Globe, RotateCcw, Home, ChevronLeft, Search
 interface CustomPrintCardProps {
   onAddToCart: (item: any) => void;
   isAdmin?: boolean;
+  settings: { title: string, price: number, description: string };
+  onUpdateSettings: (settings: any) => void;
 }
 
-export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCardProps) {
+export default function CustomPrintCard({ onAddToCart, isAdmin, settings, onUpdateSettings }: CustomPrintCardProps) {
   const initialUrl = 'https://www.dessinateur.biz/blog/'
   const [url, setUrl] = useState(initialUrl)
   const [description, setDescription] = useState('')
@@ -16,33 +18,24 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
   const [iframeKey, setIframeKey] = useState(0)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
-  // États pour le titre, le prix et le descriptif éditables
-  const [customTitle, setCustomTitle] = useState('Tirage sous cadre')
-  const [customPrice, setCustomPrice] = useState(45)
-  const [customDesc, setCustomDesc] = useState("Choisissez votre illustration préférée sur le blog (scrollez et cliquez) ou par mot clé ; je vous l'imprime, vous la mets sous cadre et je vous l'expédie.")
+  // États pour le titre, le prix et le descriptif éditables (Locaux avant validation)
+  const [customTitle, setCustomTitle] = useState(settings.title)
+  const [customPrice, setCustomPrice] = useState(settings.price)
+  const [customDesc, setCustomDesc] = useState(settings.description)
 
   useEffect(() => {
-    const savedTitle = localStorage.getItem('nagasin_custom_print_title')
-    const savedPrice = localStorage.getItem('nagasin_custom_print_price')
-    const savedDesc = localStorage.getItem('nagasin_custom_print_desc')
-    if (savedTitle) setCustomTitle(savedTitle)
-    if (savedPrice) setCustomPrice(parseFloat(savedPrice))
-    if (savedDesc) setCustomDesc(savedDesc)
-  }, [])
+    setCustomTitle(settings.title)
+    setCustomPrice(settings.price)
+    setCustomDesc(settings.description)
+  }, [settings])
 
-  const updateTitle = (val: string) => {
-    setCustomTitle(val)
-    localStorage.setItem('nagasin_custom_print_title', val)
-  }
-
-  const updatePrice = (val: number) => {
-    setCustomPrice(val)
-    localStorage.setItem('nagasin_custom_print_price', val.toString())
-  }
-
-  const updateDesc = (val: string) => {
-    setCustomDesc(val)
-    localStorage.setItem('nagasin_custom_print_desc', val)
+  const handleValidateSettings = () => {
+    onUpdateSettings({
+      title: customTitle,
+      price: customPrice,
+      description: customDesc
+    })
+    alert("Paramètres mis en attente de publication.")
   }
   
   // Écouteur de messages sécurisé venant du blog
@@ -178,7 +171,7 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
             {isAdmin ? (
               <input 
                 value={customTitle} 
-                onChange={(e) => updateTitle(e.target.value)}
+                onChange={(e) => setCustomTitle(e.target.value)}
                 style={{ 
                   fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', 
                   outline: 'none', background: 'transparent', width: '100%', marginBottom: '0.8rem' 
@@ -211,7 +204,7 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
             {isAdmin ? (
               <textarea 
                 value={customDesc} 
-                onChange={(e) => updateDesc(e.target.value)}
+                onChange={(e) => setCustomDesc(e.target.value)}
                 style={{ 
                   fontSize: '0.8rem', color: '#666', lineHeight: 1.5, margin: 0,
                   width: '100%', border: 'none', borderBottom: '1px dashed #004169', 
@@ -277,20 +270,34 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
             >
               AJOUTER AU PANIER <ShoppingCart size={18} />
             </button>
-            {isAdmin ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '5px' }}>
-                <input 
-                  type="number"
-                  value={customPrice} 
-                  onChange={(e) => updatePrice(parseFloat(e.target.value))}
+
+            {isAdmin && (
+              <div style={{ borderTop: '1px solid #eee', paddingTop: '1rem', marginTop: '1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '5px' }}>
+                  <input 
+                    type="number"
+                    value={customPrice} 
+                    onChange={(e) => setCustomPrice(parseFloat(e.target.value))}
+                    style={{ 
+                      fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', 
+                      outline: 'none', background: 'transparent', width: '80px', textAlign: 'right'
+                    }}
+                  />
+                  <span style={{ fontWeight: 900, fontSize: '1.4rem' }}>€</span>
+                </div>
+                <button 
+                  onClick={handleValidateSettings}
                   style={{ 
-                    fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', 
-                    outline: 'none', background: 'transparent', width: '80px', textAlign: 'right'
+                    width: '100%', background: '#004169', color: 'white', border: 'none', 
+                    padding: '8px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginTop: '10px' 
                   }}
-                />
-                <span style={{ fontWeight: 900, fontSize: '1.4rem' }}>€</span>
+                >
+                  VALIDER LES PARAMÈTRES ADMIN
+                </button>
               </div>
-            ) : (
+            )}
+
+            {!isAdmin && (
               <span style={{ fontSize: '1.5rem', fontWeight: 900, display: 'block', textAlign: 'right' }}>{customPrice.toFixed(2)} €</span>
             )}
           </div>
