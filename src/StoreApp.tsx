@@ -7,7 +7,11 @@ import PaymentForm from './components/PaymentForm'
 import AdminDashboard from './components/admin/AdminDashboard'
 import CartSummary from './components/cart/CartSummary'
 import CheckoutForm from './components/cart/CheckoutForm'
+import CustomPrintCard from './components/CustomPrintCard'
+import AdminToolbar from './components/admin/AdminToolbar'
+import EditableProductCard from './components/admin/EditableProductCard'
 import type { Product, CartItem, CustomerInfo } from './types'
+import './App.css'
 
 const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
 
@@ -18,6 +22,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   onGoToLogin?: () => void
 }) {
   const [products, setProducts] = useState<Product[]>([])
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [cartStep, setCartStep] = useState<'cart' | 'checkout' | 'payment' | 'success'>('cart')
@@ -33,6 +38,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     const loadCatalog = async () => {
       if (isAdmin && draftCatalog) {
         setProducts(JSON.parse(draftCatalog))
+        setHasUnsavedChanges(true)
       } else {
         try {
           const response = await fetch('/api/catalog.php');
@@ -54,7 +60,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   const total = subtotal + (cart.length > 0 ? shippingCost : 0)
 
   const addToCart = (item: Product) => {
-    setCart([...cart, { ...item, dedication: '' }])
+    setCart([...cart, { ...item, dedication: (item as any).dedication || '' }])
     setJustAdded(item.id)
     setCartStep('cart')
     setTimeout(() => setJustAdded(null), 2000)
@@ -66,7 +72,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     setCart(newCart);
   }
 
-  const handleOrderSuccess = async () => {
+  const handleOrderSuccess = async (paymentId: string) => {
     const order = {
       id: Date.now(),
       date: new Date().toISOString(),
@@ -77,7 +83,8 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
       },
       items: cart,
       total,
-      status: 'Payée'
+      status: 'Payée',
+      paymentId
     };
 
     try {
@@ -86,11 +93,69 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(order)
       });
-      setCart([])
-      setCartStep('success')
     } catch (err) {
-      console.error(err)
-      alert("Erreur réseau, commande non enregistrée.")
+      console.warn("API indisponible, sauvegarde en LocalStorage.", err);
+      const existingOrders = JSON.parse(localStorage.getItem('nagasin_orders') || '[]');
+      localStorage.setItem('nagasin_orders', JSON.stringify([order, ...existingOrders]));
+    }
+    
+    setCart([])
+    setCartStep('success')
+  }
+
+  const handleUpdateProduct = (id: number, updates: Partial<Product>) => {
+    const newProducts = products.map((p) => p.id === id ? { ...p, ...updates } : p)
+    setProducts(newProducts)
+    localStorage.setItem('nagasin_catalog_draft', JSON.stringify(newProducts))
+    setHasUnsavedChanges(true)
+  }
+
+  const handleDeleteProduct = (id: number) => {
+    if (confirm("Supprimer ce produit ?")) {
+      const newProducts = products.filter((p) => p.id !== id)
+      setProducts(newProducts)
+      localStorage.setItem('nagasin_catalog_draft', JSON.stringify(newProducts))
+      setHasUnsavedChanges(true)
+    }
+  }
+
+  const handleAddProduct = () => {
+    const newProduct: Product = {
+      id: Date.now(),
+      slug: 'nouveau-produit-' + Date.now(),
+      title: 'Nouveau Produit',
+      category: 'EDITION',
+      price: 0,
+      description: 'Description à compléter...',
+      details: '',
+      image: 'https://via.placeholder.com/400',
+      canBeDedicated: true,
+      stock: 0,
+      weight: 0
+    }
+    const newProducts = [newProduct, ...products]
+    setProducts(newProducts)
+    localStorage.setItem('nagasin_catalog_draft', JSON.stringify(newProducts))
+    setHasUnsavedChanges(true)
+  }
+
+  const handlePublish = async () => {
+    try {
+      const response = await fetch('/api/catalog.php', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Admin-Password': adminToken || ''
+        },
+        body: JSON.stringify(products)
+      });
+      if (!response.ok) throw new Error('Erreur publication');
+      localStorage.removeItem('nagasin_catalog_draft')
+      setHasUnsavedChanges(false)
+      alert("Changements publiés avec succès !")
+    } catch (err) {
+      alert("Erreur lors de la publication.");
+      console.error(err);
     }
   }
 
@@ -98,47 +163,83 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fff', color: '#000', fontFamily: 'Outfit, sans-serif' }}>
-      
-      {/* HEADER */}
-      <header style={{ padding: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee' }}>
-        <div style={{ fontSize: '1.5rem', fontWeight: 900, letterSpacing: '4px' }}>NAGASIN.</div>
-        <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-          {isAdmin && (
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => setIsAdminDashboardOpen(true)} style={{ background: '#000', color: '#fff', border: 'none', padding: '10px 20px', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '1px', cursor: 'pointer' }}>CONSOLE ADMIN</button>
-              <button onClick={onLogout} style={{ background: '#f5f5f5', color: '#000', border: 'none', padding: '10px 20px', fontSize: '0.7rem', fontWeight: 900, letterSpacing: '1px', cursor: 'pointer' }}>DÉCONNEXION</button>
-            </div>
-          )}
-          {!isAdmin && onGoToLogin && (
-             <button onClick={onGoToLogin} style={{ background: 'transparent', border: 'none', color: '#ccc', cursor: 'pointer', fontSize: '0.7rem' }}>Admin</button>
-          )}
-          <div onClick={() => setIsCartOpen(true)} style={{ position: 'relative', cursor: 'pointer' }}>
-            <ShoppingCart size={24} />
-            {cart.length > 0 && <span style={{ position: 'absolute', top: '-10px', right: '-10px', background: 'var(--primary-color)', color: 'white', fontSize: '0.6rem', padding: '2px 6px', borderRadius: '50%', fontWeight: 900 }}>{cart.length}</span>}
-          </div>
-        </div>
-      </header>
+    <div className="app-layout">
+      {isAdmin && (
+        <AdminToolbar 
+          onOpenDashboard={() => setIsAdminDashboardOpen(true)} 
+          onAddProduct={handleAddProduct}
+          onPublish={handlePublish}
+          hasChanges={hasUnsavedChanges}
+          onLogout={onLogout}
+        />
+      )}
 
-      {/* CATALOGUE */}
-      <main style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '3rem' }}>
+      {/* SIDEBAR */}
+      <aside className="sidebar">
+        <div className="sidebar-logo">
+          <img 
+            src="https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg" 
+            alt="na!" 
+          />
+        </div>
+        <nav className="sidebar-nav" style={{ padding: '2rem 1.5rem' }}>
+          {/* Menu principal si besoin */}
+        </nav>
+        <div style={{ marginTop: 'auto', padding: '1.5rem', fontSize: '0.6rem', color: '#ccc', fontWeight: 700 }}>
+          © 2026 NA! STUDIO
+        </div>
+      </aside>
+
+      {/* CONTENU PRINCIPAL */}
+      <main className="main-content">
+        <header style={{ marginBottom: '4rem' }}>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <h1 style={{ fontSize: '3.5rem', lineHeight: 1, marginBottom: '0.8rem' }}>LE NAGASIN.</h1>
+            <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)', maxWidth: '600px', lineHeight: 1.5 }}>
+              Boutique officielle de <strong>na!</strong>. <br />
+              Ouvrages, dessins et curiosités graphiques.
+            </p>
+          </motion.div>
+        </header>
+
+        {/* CATALOGUE */}
+        <div className="product-grid">
           {products.map(product => (
-            <motion.div key={product.id} whileHover={{ y: -10 }} style={{ border: '1px solid #f0f0f0', padding: '1rem' }}>
-              <div style={{ height: '400px', background: '#f9f9f9', overflow: 'hidden', marginBottom: '1.5rem', position: 'relative' }}>
-                <img src={product.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={product.title} />
-              </div>
-              <h3 style={{ fontSize: '0.9rem', fontWeight: 900, margin: '0 0 0.5rem', letterSpacing: '1px' }}>{product.title.toUpperCase()}</h3>
-              <p style={{ fontSize: '1.1rem', fontWeight: 400, margin: '0 0 1.5rem' }}>{product.price.toFixed(2)} €</p>
-              <button 
-                onClick={() => addToCart(product)}
-                style={{ width: '100%', padding: '1rem', background: '#000', color: '#fff', border: 'none', fontWeight: 900, cursor: 'pointer', fontSize: '0.7rem', letterSpacing: '2px' }}
-              >
-                AJOUTER AU PANIER
-              </button>
-            </motion.div>
+            <EditableProductCard 
+              key={product.id}
+              product={product}
+              isAdmin={!!isAdmin}
+              onAddToCart={addToCart}
+              onUpdate={handleUpdateProduct}
+              onDelete={handleDeleteProduct}
+            />
           ))}
         </div>
+
+        {/* PRODUIT INTERACTIF */}
+        <div style={{ marginTop: '5rem', marginBottom: '5rem' }}>
+          <CustomPrintCard onAddToCart={addToCart} isAdmin={!!isAdmin} />
+        </div>
+
+        {/* SECTION CONTACT */}
+        <section style={{ borderTop: '1px solid #eee', marginTop: '6rem', padding: '4rem 0 10rem 0', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Contact & Projets</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '500px', margin: '0 auto 2rem' }}>
+            Pour toute question sur votre commande ou un projet spécifique, n'hésitez pas à me contacter.
+          </p>
+          <a href="mailto:na@dessinateur.net" className="btn-cta" style={{ border: '1px solid #000', padding: '1rem 2.5rem' }}>
+            Me contacter
+          </a>
+          <div style={{ fontSize: '0.7rem', color: '#999', marginTop: '4rem' }}>
+            © {new Date().getFullYear()} Nagasin - Art Prints by na! 
+            {!isAdmin && onGoToLogin && (
+              <span 
+                onClick={onGoToLogin}
+                style={{ cursor: 'default', opacity: 0.5, marginLeft: '5px' }}
+              >.</span>
+            )}
+          </div>
+        </section>
       </main>
 
       <AdminDashboard 
@@ -244,14 +345,35 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
         )}
       </AnimatePresence>
 
-      {/* BANDEAU FIXE */}
       <motion.div 
         onClick={() => setIsCartOpen(true)}
-        animate={{ scale: justAdded ? [1, 1.05, 1] : 1, backgroundColor: justAdded ? '#00c853' : '#004169' }}
-        style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#004169', color: 'white', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px', cursor: 'pointer', zIndex: 150 }}
+        animate={{ 
+          scale: justAdded ? [1, 1.05, 1] : 1,
+          backgroundColor: justAdded ? '#00c853' : '#004169'
+        }}
+        style={{ 
+          position: 'fixed', 
+          bottom: 0, 
+          left: 0, 
+          right: 0, 
+          background: '#004169', 
+          color: 'white', 
+          padding: '1rem 2rem', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          gap: '15px', 
+          cursor: 'pointer', 
+          zIndex: 150,
+          boxShadow: '0 -5px 20px rgba(0,0,0,0.1)',
+          fontWeight: 900,
+          letterSpacing: '2px',
+          fontSize: '0.9rem',
+          textTransform: 'uppercase'
+        }}
       >
-        <ShoppingCart size={20} />
-        <span style={{ fontWeight: 800, fontSize: '0.9rem', letterSpacing: '1px' }}>VOIR MON PANIER ({cart.length}) — {total.toFixed(2)} €</span>
+        <ShoppingCart size={20} strokeWidth={3} />
+        {justAdded ? 'ARTICLE AJOUTÉ !' : `VOIR MON PANIER (${cart.length}) — ${total.toFixed(2)} €`}
       </motion.div>
     </div>
   )

@@ -1,10 +1,15 @@
 export interface Product {
   id: number;
+  slug?: string;
   title: string;
   price: number;
   image: string;
-  category: string;
-  description?: string;
+  category?: string;
+  description: string;
+  details?: string;
+  canBeDedicated?: boolean;
+  stock?: number;
+  weight?: number;
   customImage?: string;
 }
 

@@ -1,5 +1,5 @@
 import { ArrowRight, Trash2, Camera } from 'lucide-react'
-import type { Product } from '../../data/products'
+import type { Product } from '../../types'
 
 interface EditableProductCardProps {
   product: Product;

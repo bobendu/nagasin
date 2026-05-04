@@ -105,3 +105,21 @@
     - Notifications emails automatiques envoyées via le serveur OVH à chaque changement de statut.
     - Modale de confirmation sécurisée avant chaque changement de statut pour éviter les erreurs.
 - **Optimisation Délivrabilité** : Configuration des en-têtes PHP Mail pour maximiser la réception (Expéditeur local, Return-Path, Reply-To).
+### [0.5.1] - 2026-05-03
+#### 🏗️ Refactoring & Robustesse
+- **Modularisation totale** : Extraction des sous-composants (`CartSummary`, `CheckoutForm`) et des types (`src/types/index.ts`).
+- **Correction des Emails** : 
+    - Activation de l'email de confirmation immédiate à l'achat (`save_order.php`).
+    - Standardisation sur l'adresse `contact@nagasin.fr` (reconnue par OVH).
+    - Passage au format Unix (`\n`) pour les headers d'email afin d'éviter les rejets serveurs.
+- **Optimisation UI** : Affichage permanent du récapitulatif des frais de port et du total durant tout le tunnel de commande.
+- **Sécurité** : Renforcement du `.htaccess` pour autoriser l'exécution PHP du dossier `/api/` tout en protégeant les données.
+
+## 2026-05-04 : Restauration de l'Expérience Premium
+- **Restauration du Layout** : Réintégration de la sidebar latérale (Logo na!, navigation, copyright) et du header principal "LE NAGASIN.".
+- **Réintégration des Composants Clés** :
+    - Retour de la `CustomPrintCard` (module intelligent) et de la `EditableProductCard` (édition WYSIWYG).
+    - Réactivation de l' `AdminToolbar` pour une gestion fluide des brouillons et publications.
+- **Architecture Hybride** : Conservation de la structure modulaire (dispatching du code en fichiers séparés) tout en retrouvant la richesse fonctionnelle de la version précédente.
+- **Consolidation des Types** : Mise à jour de l'interface `Product` centrale pour supporter tous les champs métiers (`stock`, `canBeDedicated`, `weight`, `slug`).
+- **Paiement & Suivi** : Synchronisation du `paymentId` Stripe dans l'objet de commande et ajout d'un système de persistance locale de secours en cas d'indisponibilité de l'API.

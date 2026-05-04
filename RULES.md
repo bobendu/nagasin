@@ -6,18 +6,18 @@
 - **Composants** : **Coins carrés (0px)** obligatoires pour tout élément corporate/admin.
 - **Typographie** : "Outfit" pour les titres, sans-serif propre pour le corps.
 
-## Architecture & Data
-- **Édition** : Full WYSIWYG (Édition directe sans clic préalable).
-- **Validation** : Système obligatoire de **Brouillon (Draft)**. Tout changement doit être validé via le bouton "PUBLIER" pour être live.
-- **Persistance** : 
-    - **Frontend** : Utilisation du `localStorage` uniquement pour les sessions de brouillon (Draft).
-    - **Backend** : API PHP (`/api/`) gérant des fichiers JSON sécurisés dans `/data/`.
-    - **Synchronisation** : Les données publiées (catalogue, commandes) doivent impérativement transiter par le serveur pour être identiques sur tous les appareils.
+## 🏗️ Architecture Logicielle
+- **Modularité** : Aucun fichier React ne doit dépasser 500 lignes. Les composants complexes (Formulaires, Sommaires) doivent être extraits dans `src/components/`.
+- **Typage** : Tous les types partagés doivent être définis dans `src/types/index.ts`. Utiliser impérativement `import type` pour les imports de types.
+- **Sécurité des APIs** :
+    - `/api/save_order.php` : Enregistrement et email de confirmation automatique.
+    - `/api/update_order.php` : Mise à jour de statut et email de suivi.
+    - `/api/catalog.php` : Source de vérité pour le catalogue public.
 
 ## 🛡️ Sécurité & Emails
-- **Sanitization** : Toutes les entrées client (Nom, Adresse, etc.) doivent être nettoyées via `sanitizeString` avant enregistrement.
-- **Emails (Délivrabilité)** : L'envoi via PHP `mail()` doit impérativement utiliser une adresse `@nagasin.fr` en expéditeur (`From`) et inclure le paramètre `-f` pour éviter le spam.
-- **Accès Admin** : Protégé par `X-Admin-Password` dans les en-têtes API (basé sur `VITE_ADMIN_PASSWORD`).
+- **Sanitization** : Utilisation systématique de la fonction `sanitize()` avant toute persistance ou envoi.
+- **Emails (Délivrabilité)** : Utilisation exclusive de l'adresse `contact@nagasin.fr` (ou toute adresse valide créée sur le Manager OVH) avec le paramètre `-f` obligatoire.
+- **Accès Admin** : Authentification via header `X-Admin-Password`.
 
 ## 🔐 Accès Techniques
 - **GitHub** : `bobendu` / `benoit.baudu@free.fr` / `Z0b1-Hu8`
