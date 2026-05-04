@@ -21,7 +21,6 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
 }) {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(false)
-  const [isEditingSettings, setIsEditingSettings] = useState(false)
   const [updatingId, setUpdatingId] = useState<number | null>(null)
   const [pendingChange, setPendingChange] = useState<{ id: number, status: string, customer: string } | null>(null)
   
@@ -185,17 +184,6 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
             </div>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <button 
-                onClick={() => setIsEditingSettings(!isEditingSettings)}
-                style={{ 
-                  background: isEditingSettings ? 'var(--primary-color)' : '#f5f5f5', 
-                  color: isEditingSettings ? 'white' : '#000',
-                  border: 'none', padding: '12px', borderRadius: '12px', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 700
-                }}
-              >
-                <Settings size={18} /> RÉGLAGES
-              </button>
-              <button 
                 onClick={onClose}
                 style={{ background: '#f5f5f5', border: 'none', padding: '12px', borderRadius: '50%', cursor: 'pointer' }}
               >
@@ -206,38 +194,31 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
 
           <div style={{ flex: 1, overflowY: 'auto', padding: '3rem' }}>
             
-            {/* SETTINGS PANEL */}
-            <AnimatePresence>
-              {isEditingSettings && (
-                <motion.div 
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  style={{ overflow: 'hidden', marginBottom: '3rem', background: '#f8f9fa', borderRadius: '16px', border: '1px solid #eee' }}
-                >
-                  <div style={{ padding: '2rem' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 900, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <Truck size={18} /> CONFIGURATION DES FRAIS DE PORT
-                    </h3>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      <div style={{ background: '#fff', padding: '10px 20px', borderRadius: '8px', border: '1px solid #ddd', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <input 
-                          type="number" 
-                          step="0.1"
-                          value={shippingCost}
-                          onChange={(e) => onUpdateShipping(parseFloat(e.target.value))}
-                          style={{ border: 'none', outline: 'none', fontSize: '1.2rem', fontWeight: 800, width: '80px' }}
-                        />
-                        <span style={{ fontWeight: 800 }}>€</span>
-                      </div>
-                      <p style={{ fontSize: '0.85rem', color: '#666', margin: 0 }}>
-                        Ces frais seront ajoutés automatiquement au total du panier de chaque client.
-                      </p>
-                    </div>
+            {/* PARTICIPATION AUX FRAIS D'ENVOI (TOUJOURS VISIBLE) */}
+            <div 
+              style={{ marginBottom: '3rem', background: '#f8f9fa', borderRadius: '16px', border: '1px solid #eee' }}
+            >
+              <div style={{ padding: '2rem' }}>
+                <h3 style={{ fontSize: '0.8rem', fontWeight: 900, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#004169' }}>
+                  <Truck size={18} /> PARTICIPATIONS AUX FRAIS D'ENVOI
+                </h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                  <div style={{ background: '#fff', padding: '10px 20px', borderRadius: '8px', border: '1px solid #ddd', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <input 
+                      type="number" 
+                      step="0.1"
+                      value={shippingCost}
+                      onChange={(e) => onUpdateShipping(parseFloat(e.target.value))}
+                      style={{ border: 'none', outline: 'none', fontSize: '1.4rem', fontWeight: 900, width: '100px', color: '#004169' }}
+                    />
+                    <span style={{ fontWeight: 900, fontSize: '1.4rem', color: '#004169' }}>€</span>
                   </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <p style={{ fontSize: '0.85rem', color: '#666', margin: 0, maxWidth: '400px', lineHeight: 1.4 }}>
+                    Ce montant est ajouté automatiquement au total de chaque panier client pour couvrir les frais de traitement et d'expédition.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             {/* STATS CARDS */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '4rem' }}>
