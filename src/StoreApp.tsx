@@ -183,7 +183,27 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
           />
         </div>
         <nav className="sidebar-nav" style={{ padding: '2rem 1.5rem' }}>
-          {/* Menu principal si besoin */}
+          {isAdmin && (
+            <button 
+              onClick={handlePublish}
+              disabled={!hasUnsavedChanges}
+              style={{ 
+                background: hasUnsavedChanges ? 'var(--primary-color)' : '#eee', 
+                color: hasUnsavedChanges ? 'white' : '#999', 
+                border: 'none', 
+                padding: '12px', 
+                fontSize: '0.7rem', 
+                fontWeight: 900, 
+                cursor: hasUnsavedChanges ? 'pointer' : 'default',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                width: '100%'
+              }}
+            >
+              <CheckCircle size={14} /> PUBLIER
+            </button>
+          )}
         </nav>
         <div style={{ marginTop: 'auto', padding: '1.5rem', fontSize: '0.6rem', color: '#ccc', fontWeight: 700 }}>
           © 2026 NA! STUDIO

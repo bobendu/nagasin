@@ -58,19 +58,24 @@ export default function AdminToolbar({
         <PlusCircle size={16} /> NOUVEAU PRODUIT
       </button>
 
-      {hasChanges && (
-        <button 
-          onClick={onPublish}
-          style={{ 
-            background: logoBlue, color: 'white', border: 'none', cursor: 'pointer', 
-            padding: '8px 20px', borderRadius: '0',
-            display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 900,
-            letterSpacing: '1px', boxShadow: '0 0 20px rgba(0,65,105,0.5)'
-          }}
-        >
-          <CheckCircle size={16} /> PUBLIER LES CHANGEMENTS
-        </button>
-      )}
+      <button 
+        onClick={onPublish}
+        disabled={!hasChanges}
+        style={{ 
+          background: hasChanges ? logoBlue : '#222', 
+          color: hasChanges ? 'white' : '#666', 
+          border: 'none', 
+          cursor: hasChanges ? 'pointer' : 'default', 
+          padding: '8px 20px', borderRadius: '0',
+          display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', fontWeight: 900,
+          letterSpacing: '1px', 
+          boxShadow: hasChanges ? '0 0 20px rgba(0,65,105,0.5)' : 'none',
+          transition: 'all 0.3s ease'
+        }}
+      >
+        <CheckCircle size={16} /> 
+        {hasChanges ? 'PUBLIER LES CHANGEMENTS' : 'DÉJÀ PUBLIÉ'}
+      </button>
 
       <button 
         onClick={onLogout}
