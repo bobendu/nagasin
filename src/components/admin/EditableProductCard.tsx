@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { ArrowRight, Trash2, Camera, Check, X } from 'lucide-react'
+import { ArrowRight, Trash2, Camera } from 'lucide-react'
 import type { Product } from '../../types'
 
 interface EditableProductCardProps {
@@ -11,28 +10,15 @@ interface EditableProductCardProps {
 }
 
 export default function EditableProductCard({ product, isAdmin, onAddToCart, onUpdate, onDelete }: EditableProductCardProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [localProduct, setLocalProduct] = useState(product)
-
-  const handleLocalChange = (field: keyof Product, value: any) => {
-    setLocalProduct(prev => ({ ...prev, [field]: value }))
-  }
-
-  const handleSave = () => {
-    onUpdate(product.id, localProduct)
-    setIsEditing(false)
-  }
-
-  const handleCancel = () => {
-    setLocalProduct(product)
-    setIsEditing(false)
+  const handleChange = (field: keyof Product, value: any) => {
+    onUpdate(product.id, { [field]: value })
   }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        handleLocalChange('image', reader.result as string)
+        handleChange('image', reader.result as string)
       }
       reader.readAsDataURL(e.target.files[0])
     }
@@ -43,9 +29,8 @@ export default function EditableProductCard({ product, isAdmin, onAddToCart, onU
       paddingBottom: '3rem', 
       position: 'relative',
       transition: 'all 0.3s ease',
-      border: isAdmin ? (isEditing ? '2px solid #004169' : '1px dashed #ccc') : 'none',
-      padding: isAdmin ? '1rem' : '0',
-      background: isAdmin && isEditing ? '#f8fbff' : 'transparent'
+      border: isAdmin ? '1px dashed #004169' : 'none',
+      padding: isAdmin ? '1rem' : '0'
     }}>
       {/* DELETE BUTTON (ADMIN ONLY) */}
       {isAdmin && (
@@ -63,7 +48,7 @@ export default function EditableProductCard({ product, isAdmin, onAddToCart, onU
 
       {/* IMAGE SECTION */}
       <div className="image-container" style={{ position: 'relative' }}>
-        <img src={isEditing ? localProduct.image : product.image} alt={product.title} />
+        <img src={product.image} alt={product.title} />
         {isAdmin && (
           <label style={{ 
             position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', 
@@ -72,24 +57,24 @@ export default function EditableProductCard({ product, isAdmin, onAddToCart, onU
           }} className="hover-overlay">
             <Camera size={32} />
             <span style={{ fontSize: '0.7rem', fontWeight: 900 }}>CHANGER L'IMAGE</span>
-            <input type="file" style={{ display: 'none' }} onChange={handleImageChange} onClick={() => setIsEditing(true)} />
+            <input type="file" style={{ display: 'none' }} onChange={handleImageChange} />
           </label>
         )}
       </div>
 
       {/* TEXT CONTENT */}
       <div style={{ marginTop: '1.5rem' }}>
-        {isAdmin && (isEditing || product.price === 0) ? (
+        {isAdmin ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             <input 
-              value={localProduct.title} 
-              onChange={e => handleLocalChange('title', e.target.value)}
+              value={product.title} 
+              onChange={e => handleChange('title', e.target.value)}
               placeholder="Titre du produit"
               style={{ fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', outline: 'none', width: '100%', background: 'transparent' }}
             />
             <textarea 
-              value={localProduct.description} 
-              onChange={e => handleLocalChange('description', e.target.value)}
+              value={product.description} 
+              onChange={e => handleChange('description', e.target.value)}
               placeholder="Description courte"
               rows={2}
               style={{ fontSize: '0.9rem', color: '#666', border: 'none', borderBottom: '1px solid #eee', outline: 'none', width: '100%', resize: 'none', background: 'transparent' }}
@@ -99,8 +84,8 @@ export default function EditableProductCard({ product, isAdmin, onAddToCart, onU
                 <label style={{ fontSize: '0.6rem', fontWeight: 900, color: '#999' }}>PRIX (€)</label>
                 <input 
                   type="number"
-                  value={localProduct.price} 
-                  onChange={e => handleLocalChange('price', parseFloat(e.target.value))}
+                  value={product.price} 
+                  onChange={e => handleChange('price', parseFloat(e.target.value))}
                   style={{ fontSize: '1.1rem', fontWeight: 800, border: 'none', borderBottom: '1px solid #eee', outline: 'none', width: '100%', background: 'transparent' }}
                 />
               </div>
@@ -108,41 +93,20 @@ export default function EditableProductCard({ product, isAdmin, onAddToCart, onU
                 <label style={{ fontSize: '0.6rem', fontWeight: 900, color: '#999' }}>STOCK</label>
                 <input 
                   type="number"
-                  value={localProduct.stock} 
-                  onChange={e => handleLocalChange('stock', parseInt(e.target.value))}
+                  value={product.stock} 
+                  onChange={e => handleChange('stock', parseInt(e.target.value))}
                   style={{ fontSize: '1.1rem', fontWeight: 800, border: 'none', borderBottom: '1px solid #eee', outline: 'none', width: '100%', background: 'transparent' }}
                 />
               </div>
             </div>
             
-            <div style={{ display: 'flex', gap: '10px', marginTop: '1rem' }}>
-              <button 
-                onClick={handleSave}
-                style={{ flex: 1, background: '#22c55e', color: 'white', border: 'none', padding: '10px', fontWeight: 900, fontSize: '0.7rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
-              >
-                <Check size={14} /> VALIDER MODIFS
-              </button>
-              <button 
-                onClick={handleCancel}
-                style={{ background: '#eee', color: '#666', border: 'none', padding: '10px', fontWeight: 900, fontSize: '0.7rem', cursor: 'pointer' }}
-              >
-                <X size={14} />
-              </button>
-            </div>
+            <button className="btn-cta" style={{ marginTop: '1rem', opacity: 0.5, pointerEvents: 'none' }}>
+              MODE ÉDITION ACTIF
+            </button>
           </div>
         ) : (
           <>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <h3 style={{ fontSize: '1.6rem', margin: '0 0 1rem', flex: 1 }}>{product.title}</h3>
-              {isAdmin && (
-                <button 
-                  onClick={() => setIsEditing(true)}
-                  style={{ background: 'transparent', border: '1px solid #ccc', padding: '4px 10px', fontSize: '0.6rem', fontWeight: 800, cursor: 'pointer' }}
-                >
-                  MODIFIER
-                </button>
-              )}
-            </div>
+            <h3 style={{ fontSize: '1.6rem', margin: '0.5rem 0 1rem' }}>{product.title}</h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.5', maxWidth: '400px' }}>
               {product.description}
             </p>

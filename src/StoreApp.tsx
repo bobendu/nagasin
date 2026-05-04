@@ -51,7 +51,12 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
           const response = await fetch('/api/catalog.php');
           if (response.ok) {
             const data = await response.json();
-            setProducts(data);
+            if (data.products) {
+              setProducts(data.products);
+              if (data.customPrintSettings) setCustomPrintSettings(data.customPrintSettings);
+            } else {
+              setProducts(data);
+            }
           } else {
             throw new Error('Fallback');
           }

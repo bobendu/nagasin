@@ -18,24 +18,8 @@ export default function CustomPrintCard({ onAddToCart, isAdmin, settings, onUpda
   const [iframeKey, setIframeKey] = useState(0)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
-  // États pour le titre, le prix et le descriptif éditables (Locaux avant validation)
-  const [customTitle, setCustomTitle] = useState(settings.title)
-  const [customPrice, setCustomPrice] = useState(settings.price)
-  const [customDesc, setCustomDesc] = useState(settings.description)
-
-  useEffect(() => {
-    setCustomTitle(settings.title)
-    setCustomPrice(settings.price)
-    setCustomDesc(settings.description)
-  }, [settings])
-
-  const handleValidateSettings = () => {
-    onUpdateSettings({
-      title: customTitle,
-      price: customPrice,
-      description: customDesc
-    })
-    alert("Paramètres mis en attente de publication.")
+  const handleChange = (field: string, value: any) => {
+    onUpdateSettings({ ...settings, [field]: value })
   }
   
   // Écouteur de messages sécurisé venant du blog
@@ -58,8 +42,8 @@ export default function CustomPrintCard({ onAddToCart, isAdmin, settings, onUpda
   const handleOrder = () => {
     onAddToCart({
       id: Date.now(),
-      title: customTitle,
-      price: customPrice,
+      title: settings.title,
+      price: settings.price,
       image: selectedImage || "https://www.dessinateur.net/wp-content/uploads/2024/06/logoNadessinateur.jpg",
       description: `Tirage du dessin : ${description}`,
       dedication: dedication,
@@ -170,18 +154,18 @@ export default function CustomPrintCard({ onAddToCart, isAdmin, settings, onUpda
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', flex: 1 }}>
             {isAdmin ? (
               <input 
-                value={customTitle} 
-                onChange={(e) => setCustomTitle(e.target.value)}
+                value={settings.title} 
+                onChange={(e) => handleChange('title', e.target.value)}
                 style={{ 
                   fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', 
                   outline: 'none', background: 'transparent', width: '100%', marginBottom: '0.8rem' 
                 }}
               />
             ) : (
-              <h2 style={{ fontSize: '1.5rem', margin: '0 0 0.8rem', lineHeight: 1.1, fontWeight: 900 }}>{customTitle}</h2>
+              <h2 style={{ fontSize: '1.5rem', margin: '0 0 0.8rem', lineHeight: 1.1, fontWeight: 900 }}>{settings.title}</h2>
             )}
             
-            {/* RECHERCHE DYNAMIQUE DÉPLACÉE ICI */}
+            {/* RECHERCHE DYNAMIQUE */}
             <div style={{ 
               display: 'flex', alignItems: 'center', background: '#fff', borderRadius: '8px', 
               border: '1px solid #eee', padding: '6px 10px', gap: '8px', marginBottom: '1rem',
@@ -203,8 +187,8 @@ export default function CustomPrintCard({ onAddToCart, isAdmin, settings, onUpda
 
             {isAdmin ? (
               <textarea 
-                value={customDesc} 
-                onChange={(e) => setCustomDesc(e.target.value)}
+                value={settings.description} 
+                onChange={(e) => handleChange('description', e.target.value)}
                 style={{ 
                   fontSize: '0.8rem', color: '#666', lineHeight: 1.5, margin: 0,
                   width: '100%', border: 'none', borderBottom: '1px dashed #004169', 
@@ -213,7 +197,7 @@ export default function CustomPrintCard({ onAddToCart, isAdmin, settings, onUpda
               />
             ) : (
               <p style={{ fontSize: '0.8rem', color: '#666', lineHeight: 1.5, margin: 0 }}>
-                {customDesc}
+                {settings.description}
               </p>
             )}
           </div>
@@ -271,34 +255,21 @@ export default function CustomPrintCard({ onAddToCart, isAdmin, settings, onUpda
               AJOUTER AU PANIER <ShoppingCart size={18} />
             </button>
 
-            {isAdmin && (
-              <div style={{ borderTop: '1px solid #eee', paddingTop: '1rem', marginTop: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '5px' }}>
-                  <input 
-                    type="number"
-                    value={customPrice} 
-                    onChange={(e) => setCustomPrice(parseFloat(e.target.value))}
-                    style={{ 
-                      fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', 
-                      outline: 'none', background: 'transparent', width: '80px', textAlign: 'right'
-                    }}
-                  />
-                  <span style={{ fontWeight: 900, fontSize: '1.4rem' }}>€</span>
-                </div>
-                <button 
-                  onClick={handleValidateSettings}
+            {isAdmin ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '5px' }}>
+                <input 
+                  type="number"
+                  value={settings.price} 
+                  onChange={(e) => handleChange('price', parseFloat(e.target.value))}
                   style={{ 
-                    width: '100%', background: '#004169', color: 'white', border: 'none', 
-                    padding: '8px', fontSize: '0.7rem', fontWeight: 900, cursor: 'pointer', marginTop: '10px' 
+                    fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', 
+                    outline: 'none', background: 'transparent', width: '80px', textAlign: 'right'
                   }}
-                >
-                  VALIDER LES PARAMÈTRES ADMIN
-                </button>
+                />
+                <span style={{ fontWeight: 900, fontSize: '1.4rem' }}>€</span>
               </div>
-            )}
-
-            {!isAdmin && (
-              <span style={{ fontSize: '1.5rem', fontWeight: 900, display: 'block', textAlign: 'right' }}>{customPrice.toFixed(2)} €</span>
+            ) : (
+              <span style={{ fontSize: '1.5rem', fontWeight: 900, display: 'block', textAlign: 'right' }}>{settings.price.toFixed(2)} €</span>
             )}
           </div>
         </div>
