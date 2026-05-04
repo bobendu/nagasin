@@ -167,4 +167,3 @@ export default function EditableProductCard({ product, isAdmin, onAddToCart, onU
     </div>
   )
 }
-}
