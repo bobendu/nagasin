@@ -269,30 +269,30 @@ export default function CustomPrintCard({ onAddToCart, isAdmin }: CustomPrintCar
           </div>
 
           <div style={{ marginTop: 'auto' }}>
+            <button 
+              className="btn-cta" 
+              onClick={handleOrder}
+              disabled={!selectedImage && !description}
+              style={{ width: '100%', borderRadius: '8px', padding: '0.8rem', fontSize: '0.8rem', opacity: (selectedImage || description) ? 1 : 0.5, marginBottom: '1.5rem' }}
+            >
+              AJOUTER AU PANIER <ShoppingCart size={18} />
+            </button>
             {isAdmin ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '0.8rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '5px' }}>
                 <input 
                   type="number"
                   value={customPrice} 
                   onChange={(e) => updatePrice(parseFloat(e.target.value))}
                   style={{ 
                     fontSize: '1.4rem', fontWeight: 900, border: 'none', borderBottom: '2px solid #004169', 
-                    outline: 'none', background: 'transparent', width: '80px' 
+                    outline: 'none', background: 'transparent', width: '80px', textAlign: 'right'
                   }}
                 />
                 <span style={{ fontWeight: 900, fontSize: '1.4rem' }}>€</span>
               </div>
             ) : (
-              <span style={{ fontSize: '1.5rem', fontWeight: 900, display: 'block', marginBottom: '0.8rem' }}>{customPrice.toFixed(2)} €</span>
+              <span style={{ fontSize: '1.5rem', fontWeight: 900, display: 'block', textAlign: 'right' }}>{customPrice.toFixed(2)} €</span>
             )}
-            <button 
-              className="btn-cta" 
-              onClick={handleOrder}
-              disabled={!selectedImage && !description}
-              style={{ width: '100%', borderRadius: '8px', padding: '0.8rem', fontSize: '0.8rem', opacity: (selectedImage || description) ? 1 : 0.5 }}
-            >
-              AJOUTER AU PANIER <ShoppingCart size={18} />
-            </button>
           </div>
         </div>
       </div>

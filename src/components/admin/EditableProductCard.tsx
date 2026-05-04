@@ -111,13 +111,13 @@ export default function EditableProductCard({ product, isAdmin, onAddToCart, onU
               {product.description}
             </p>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontWeight: 900, fontSize: '1.3rem' }}>{product.price} €</span>
-                {isAdmin && <span style={{ fontSize: '0.7rem', color: (product.stock ?? 0) > 0 ? '#22c55e' : '#ff4444', fontWeight: 800 }}>STOCK: {product.stock ?? 0}</span>}
-              </div>
               <button className="btn-cta" onClick={() => onAddToCart(product)}>
                 ACHETER <ArrowRight size={16} />
               </button>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                <span style={{ fontWeight: 900, fontSize: '1.3rem' }}>{product.price} €</span>
+                {isAdmin && <span style={{ fontSize: '0.7rem', color: (product.stock ?? 0) > 0 ? '#22c55e' : '#ff4444', fontWeight: 800 }}>STOCK: {product.stock ?? 0}</span>}
+              </div>
             </div>
           </>
         )}
