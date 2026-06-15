@@ -91,6 +91,11 @@ if ($found) {
                 <div style='margin: 30px 0;'>
                     <span class='status-badge'>" . $newStatus . "</span>
                 </div>
+                
+                <div style='text-align: center; margin: 30px 0;'>
+                    <a href='https://www.nagasin.fr/?orderId=" . $orderId . "' style='background: #004169; color: white; padding: 14px 28px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block; border-radius: 0px; text-transform: uppercase; letter-spacing: 1px;'>Voir ma commande & Facture</a>
+                </div>
+
                 <hr style='border:none; border-top:1px solid #eee; margin:30px 0;'>
                 <p style='font-size: 14px;'>Merci de votre confiance,<br><strong style='color: #004169;'>L'équipe Nagasin</strong></p>
             </div>

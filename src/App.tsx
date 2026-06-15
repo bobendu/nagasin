@@ -2,18 +2,25 @@ import { useState, useEffect } from 'react'
 import StoreApp from './StoreApp'
 import { motion } from 'framer-motion'
 import { Lock, Edit3 } from 'lucide-react'
+import OrderStatusTracking from './components/OrderStatusTracking'
 
 function App() {
-  const [view, setView] = useState<'maintenance' | 'login' | 'admin' | 'store'>('maintenance')
+  const [view, setView] = useState<'maintenance' | 'login' | 'admin' | 'store' | 'tracking'>('maintenance')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [password, setPassword] = useState('')
   const [adminToken, setAdminToken] = useState('') // Stocke le password pour l'API
   const [user, setUser] = useState('')
+  const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null)
 
   const [, setSecretClicks] = useState(0)
 
   useEffect(() => {
-    if (window.location.pathname.includes('nadmin') || window.location.search.includes('nadmin')) {
+    const params = new URLSearchParams(window.location.search)
+    const orderId = params.get('orderId')
+    if (orderId) {
+      setTrackingOrderId(orderId)
+      setView('tracking')
+    } else if (window.location.pathname.includes('nadmin') || window.location.search.includes('nadmin')) {
       if (!isLoggedIn) setView('login')
     }
   }, [isLoggedIn])
@@ -39,6 +46,19 @@ function App() {
     } else {
       alert("Accès refusé.")
     }
+  }
+
+  // --- TRACKING VIEW ---
+  if (view === 'tracking') {
+    return (
+      <OrderStatusTracking 
+        orderId={trackingOrderId} 
+        onClose={() => {
+          window.history.replaceState({}, document.title, window.location.pathname)
+          setView('maintenance')
+        }} 
+      />
+    )
   }
 
   // --- MAINTENANCE ---
