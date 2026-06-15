@@ -41,11 +41,12 @@ if (file_put_contents($file, json_encode($orders, JSON_PRETTY_PRINT))) {
     $total = $data['total'];
     
     $subject = "Confirmation de votre commande Nagasin #" . substr($orderId, -6);
+    $subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
     
-    $headers = "MIME-Version: 1.0\n";
-    $headers .= "Content-type:text/html;charset=UTF-8\n";
-    $headers .= "From: contact@nagasin.fr\n";
-    $headers .= "Reply-To: na@dessinateur.net\n";
+    $headers = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-type: text/html; charset=UTF-8\r\n";
+    $headers .= "From: Le Nagasin <contact@nagasin.fr>\r\n";
+    $headers .= "Reply-To: na@dessinateur.net\r\n";
     $headers .= "X-Mailer: PHP/" . phpversion();
 
     $htmlContent = "

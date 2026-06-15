@@ -50,6 +50,7 @@ if ($found) {
     // ENVOI DE L'EMAIL AU CLIENT
     $to = $orderData['customer']['email'];
     $subject = "Commande Nagasin #" . substr($orderId, -6) . " : " . $newStatus;
+    $subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
     
     $statusMessages = [
         "Payée" => "Votre commande a bien été reçue et est en attente de traitement.",
@@ -59,10 +60,10 @@ if ($found) {
     
     $messageText = $statusMessages[$newStatus] ?? "Le statut de votre commande a été mis à jour : " . $newStatus;
     
-    $headers = "MIME-Version: 1.0\n";
-    $headers .= "Content-type:text/html;charset=UTF-8\n";
-    $headers .= "From: contact@nagasin.fr\n";
-    $headers .= "Reply-To: na@dessinateur.net\n";
+    $headers = "MIME-Version: 1.0\r\n";
+    $headers .= "Content-type: text/html; charset=UTF-8\r\n";
+    $headers .= "From: Le Nagasin <contact@nagasin.fr>\r\n";
+    $headers .= "Reply-To: na@dessinateur.net\r\n";
     $headers .= "X-Mailer: PHP/" . phpversion();
 
     $htmlContent = "
