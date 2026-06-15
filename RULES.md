@@ -25,3 +25,4 @@
 
 ## 💎 Préceptes de Développement (Crucial)
 - **Non-Régression Absolue** : Pour chaque nouvel ajustement ou correctif, il est impératif de veiller à ne JAMAIS détruire ce qui est déjà en place et fonctionnel. Toute modification doit respecter l'intégrité technique et visuelle des fonctionnalités existantes.
+- **Conformité Légale (Factures)** : Conformément aux règles fiscales françaises, les factures émises sont inaltérables. Les informations de facturation de l'émetteur (nom, adresse, mentions de TVA, etc.) doivent être **figées dans l'objet de la commande à l'achat**. Les modifications apportées ultérieurement à la configuration globale ne doivent pas affecter rétroactivement les factures des commandes passées.

@@ -124,3 +124,14 @@
 - **Consolidation des Types** : Mise à jour de l'interface `Product` centrale pour supporter tous les champs métiers (`stock`, `canBeDedicated`, `weight`, `slug`).
 - **Paiement & Suivi** : Synchronisation du `paymentId` Stripe dans l'objet de commande et ajout d'un système de persistance locale de secours en cas d'indisponibilité de l'API.
 - **Principe de Non-Régression** : Adoption du précepte "Ne pas détruire ce qui fonctionne" comme règle d'or pour tout développement futur, consigné dans la Bible (`RULES.md`).
+
+## 2026-06-15 : Détails commandes admin, Visibilité mot de passe, Éditeur de factures (Conformité Légale)
+- **Détails Financiers Commandes (Admin)** :
+  - Calcul et affichage automatique du sous-total des articles et des frais d'expédition pour chaque commande dans [AdminDashboard.tsx](file:///c:/Users/dubo/.gemini/antigravity/scratch/nagasin/src/components/admin/AdminDashboard.tsx).
+  - Affichage individuel du prix des produits achetés à côté de leur titre dans les détails de commande.
+- **Sécurité Visuelle (Connexion Admin)** :
+  - Ajout d'une option d'affichage/masquage de la saisie (icône œil `Eye`/`EyeOff` de `lucide-react`) sur la modale de connexion d'administration dans [App.tsx](file:///c:/Users/dubo/.gemini/antigravity/scratch/nagasin/src/App.tsx).
+- **Édition Globale & Inaltérabilité des Factures (Légal)** :
+  - **Éditeur de facture** : Ajout d'un panneau de configuration des informations d'en-tête de facture (nom, adresse, email, site, mentions TVA, bas de page) dans le dashboard d'administration.
+  - **Figeage à la commande (Inaltérabilité)** : Conformément à l'article 286 du CGI, les réglages de facturation en vigueur lors de l'achat sont figés et enregistrés de manière irréversible dans la commande dans [StoreApp.tsx](file:///c:/Users/dubo/.gemini/antigravity/scratch/nagasin/src/StoreApp.tsx) lors de la commande.
+  - **Intégration API & Rendu Client** : Adaptation de [order_status.php](file:///c:/Users/dubo/.gemini/antigravity/scratch/nagasin/public/api/order_status.php) et [OrderStatusTracking.tsx](file:///c:/Users/dubo/.gemini/antigravity/scratch/nagasin/src/components/OrderStatusTracking.tsx) pour charger, renvoyer et restituer prioritairement ces données figées, tout en utilisant la configuration globale comme valeur de repli pour les anciennes commandes.
