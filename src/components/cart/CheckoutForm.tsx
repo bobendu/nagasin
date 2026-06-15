@@ -3,9 +3,18 @@ import type { CustomerInfo } from '../../types'
 interface CheckoutFormProps {
   customerInfo: CustomerInfo;
   setCustomerInfo: (info: CustomerInfo) => void;
+  cgvAccepted: boolean;
+  setCgvAccepted: (accepted: boolean) => void;
+  onOpenLegal: (doc: 'mentions' | 'cgv' | 'privacy') => void;
 }
 
-export default function CheckoutForm({ customerInfo, setCustomerInfo }: CheckoutFormProps) {
+export default function CheckoutForm({ 
+  customerInfo, 
+  setCustomerInfo, 
+  cgvAccepted, 
+  setCgvAccepted, 
+  onOpenLegal 
+}: CheckoutFormProps) {
   return (
     <div style={{ marginTop: '1rem', padding: '1.5rem', background: '#f9f9f9', borderRadius: '12px' }}>
       <h4 style={{ fontSize: '0.8rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '1px' }}>INFOS DE LIVRAISON</h4>
@@ -58,6 +67,32 @@ export default function CheckoutForm({ customerInfo, setCustomerInfo }: Checkout
             onChange={(e) => setCustomerInfo({...customerInfo, city: e.target.value})}
             style={{ flex: 1, padding: '0.8rem', border: '1px solid #eee', fontSize: '0.85rem' }} 
           />
+        </div>
+
+        <div style={{ marginTop: '0.5rem', display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+          <input 
+            type="checkbox" 
+            id="accept-cgv-checkbox"
+            checked={cgvAccepted} 
+            onChange={(e) => setCgvAccepted(e.target.checked)} 
+            style={{ marginTop: '3px', cursor: 'pointer' }}
+          />
+          <label htmlFor="accept-cgv-checkbox" style={{ fontSize: '0.75rem', color: '#555', cursor: 'pointer', lineHeight: 1.4, userSelect: 'none' }}>
+            J'accepte sans réserve les{' '}
+            <span 
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onOpenLegal('cgv'); }} 
+              style={{ color: 'var(--primary-color)', textDecoration: 'underline', fontWeight: 700, cursor: 'pointer' }}
+            >
+              Conditions Générales de Vente (CGV)
+            </span>{' '}
+            et la{' '}
+            <span 
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onOpenLegal('privacy'); }} 
+              style={{ color: 'var(--primary-color)', textDecoration: 'underline', fontWeight: 700, cursor: 'pointer' }}
+            >
+              Politique de Confidentialité
+            </span>.
+          </label>
         </div>
       </div>
     </div>

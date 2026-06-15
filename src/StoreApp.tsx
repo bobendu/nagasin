@@ -10,6 +10,7 @@ import CheckoutForm from './components/cart/CheckoutForm'
 import CustomPrintCard from './components/CustomPrintCard'
 import AdminToolbar from './components/admin/AdminToolbar'
 import EditableProductCard from './components/admin/EditableProductCard'
+import LegalModals from './components/LegalModals'
 import type { Product, CartItem, CustomerInfo } from './types'
 import './App.css'
 
@@ -32,6 +33,8 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({ 
     firstName: '', lastName: '', email: '', emailConfirm: '', address: '', zipCode: '', city: '' 
   })
+  const [activeLegalDoc, setActiveLegalDoc] = useState<'mentions' | 'cgv' | 'privacy' | null>(null)
+  const [cgvAccepted, setCgvAccepted] = useState(false)
   const [customPrintSettings, setCustomPrintSettings] = useState({
     title: 'Tirage sous cadre',
     price: 45,
@@ -115,6 +118,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     
     setCart([])
     setCartStep('success')
+    setCgvAccepted(false)
   }
 
   const handleUpdateProduct = (id: number, updates: Partial<Product>) => {
@@ -247,8 +251,15 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
             </button>
           )}
         </nav>
-        <div style={{ marginTop: 'auto', padding: '1.5rem', fontSize: '0.6rem', color: '#ccc', fontWeight: 700 }}>
-          © 2026 NA! STUDIO
+        <div style={{ marginTop: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.55rem', color: '#999', fontWeight: 700 }}>
+            <span onClick={() => setActiveLegalDoc('mentions')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Mentions Légales</span>
+            <span onClick={() => setActiveLegalDoc('cgv')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>CGV</span>
+            <span onClick={() => setActiveLegalDoc('privacy')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Confidentialité</span>
+          </div>
+          <div style={{ fontSize: '0.6rem', color: '#ccc', fontWeight: 700 }}>
+            © 2026 NA! STUDIO
+          </div>
         </div>
       </aside>
 
@@ -297,14 +308,21 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
           <a href="mailto:na@dessinateur.net" className="btn-cta" style={{ border: '1px solid #000', padding: '1rem 2.5rem' }}>
             Me contacter
           </a>
-          <div style={{ fontSize: '0.7rem', color: '#999', marginTop: '4rem' }}>
-            © {new Date().getFullYear()} Nagasin - Art Prints by na! 
-            {!isAdmin && onGoToLogin && (
-              <span 
-                onClick={onGoToLogin}
-                style={{ cursor: 'default', opacity: 0.5, marginLeft: '5px' }}
-              >.</span>
-            )}
+          <div style={{ fontSize: '0.7rem', color: '#999', marginTop: '4rem', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+              <span onClick={() => setActiveLegalDoc('mentions')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Mentions Légales</span>
+              <span onClick={() => setActiveLegalDoc('cgv')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>CGV</span>
+              <span onClick={() => setActiveLegalDoc('privacy')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>Confidentialité</span>
+            </div>
+            <div>
+              © {new Date().getFullYear()} Nagasin - Art Prints by na! 
+              {!isAdmin && onGoToLogin && (
+                <span 
+                  onClick={onGoToLogin}
+                  style={{ cursor: 'default', opacity: 0.5, marginLeft: '5px' }}
+                >.</span>
+              )}
+            </div>
           </div>
         </section>
       </main>
@@ -359,7 +377,15 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
                       </div>
                     ))}
 
-                    {cartStep === 'checkout' && <CheckoutForm customerInfo={customerInfo} setCustomerInfo={setCustomerInfo} />}
+                    {cartStep === 'checkout' && (
+                      <CheckoutForm 
+                        customerInfo={customerInfo} 
+                        setCustomerInfo={setCustomerInfo} 
+                        cgvAccepted={cgvAccepted}
+                        setCgvAccepted={setCgvAccepted}
+                        onOpenLegal={setActiveLegalDoc}
+                      />
+                    )}
 
                     {cartStep === 'payment' && (
                       <Elements stripe={stripePromise}>
@@ -396,6 +422,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
                           if (!sanitize(s.firstName) || !sanitize(s.lastName) || !sanitize(s.email) || !sanitize(s.address) || !sanitize(s.zipCode) || !sanitize(s.city)) return alert("Merci de tout remplir.");
                           if (!validateEmail(s.email)) return alert("Email invalide.");
                           if (s.email !== s.emailConfirm) return alert("Emails différents.");
+                          if (!cgvAccepted) return alert("Veuillez accepter les Conditions Générales de Vente (CGV) et la Politique de Confidentialité pour continuer.");
                           setCartStep('payment');
                         }}
                         style={{ width: '100%', background: '#000', color: 'white', padding: '1.2rem', border: 'none', fontWeight: 900, letterSpacing: '2px', cursor: 'pointer', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
@@ -442,6 +469,8 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
         <ShoppingCart size={20} strokeWidth={3} />
         {justAdded ? 'ARTICLE AJOUTÉ !' : `VOIR MON PANIER (${cart.length}) — ${total.toFixed(2)} €`}
       </motion.div>
+
+      <LegalModals activeDoc={activeLegalDoc} onClose={() => setActiveLegalDoc(null)} />
     </div>
   )
 }

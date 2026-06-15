@@ -285,3 +285,132 @@ body {
     font-size: 1rem;
   }
 }
+
+/* --- MODALES LÉGALES --- */
+.legal-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.legal-modal-content {
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 0px; /* Coins carrés obligatoires */
+  width: 100%;
+  max-width: 750px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.15); /* Ombre plate pour style sketchy/art */
+}
+
+.legal-close-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-main);
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legal-close-btn:hover {
+  color: var(--primary-color);
+}
+
+.legal-body {
+  padding: 3rem 2.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Custom Scrollbar pour le style papier */
+.legal-body::-webkit-scrollbar {
+  width: 8px;
+}
+.legal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+.legal-body::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+}
+
+.legal-body h2 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--primary-color);
+  margin-bottom: 2rem;
+  letter-spacing: 1px;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 0.5rem;
+}
+
+.legal-section {
+  margin-bottom: 2rem;
+}
+
+.legal-section h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 0.8rem;
+  color: var(--text-main);
+}
+
+.legal-section p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.legal-section a {
+  color: var(--primary-color);
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.legal-warning-box {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  background: #fffbeb; /* Fond jaune très clair */
+  border-left: 4px solid #d97706; /* Bordure orange/ambre */
+  color: #92400e;
+}
+
+.legal-warning-box strong {
+  display: block;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.legal-warning-box p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #b45309;
+}
+
+/* Ajustements responsifs pour mobile */
+@media (max-width: 768px) {
+  .legal-body {
+    padding: 2rem 1.5rem;
+  }
+  
+  .legal-body h2 {
+    font-size: 1.4rem;
+  }
+}
