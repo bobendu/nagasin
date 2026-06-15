@@ -49,30 +49,33 @@ foreach ($orders as $order) {
                 ];
             }, $order['items']),
             "total" => $order['total'],
-            "status" => $order['status']
+            "status" => $order['status'],
+            "invoiceSettings" => $order['invoiceSettings'] ?? null
         ];
         break;
     }
 }
 
 if ($foundOrder) {
-    $catalogFile = '../data/catalog.json';
-    $invoiceSettings = [
-        "sellerName" => "Benoît Baudu (na!)",
-        "sellerDetails" => "Artiste-Auteur / NA! Studio",
-        "sellerEmail" => "contact@nagasin.fr",
-        "sellerWebsite" => "www.nagasin.fr",
-        "legalNotice" => "TVA non applicable - article 293 B du CGI",
-        "footerText" => "Facture acquittée. Mode de règlement : Carte Bancaire via Stripe.\nNagasin Studio par na! - Tous droits réservés."
-    ];
+    if (empty($foundOrder['invoiceSettings'])) {
+        $catalogFile = '../data/catalog.json';
+        $invoiceSettings = [
+            "sellerName" => "Benoît Baudu (na!)",
+            "sellerDetails" => "Artiste-Auteur / NA! Studio",
+            "sellerEmail" => "contact@nagasin.fr",
+            "sellerWebsite" => "www.nagasin.fr",
+            "legalNotice" => "TVA non applicable - article 293 B du CGI",
+            "footerText" => "Facture acquittée. Mode de règlement : Carte Bancaire via Stripe.\nNagasin Studio par na! - Tous droits réservés."
+        ];
 
-    if (file_exists($catalogFile)) {
-        $catalog = json_decode(file_get_contents($catalogFile), true);
-        if (is_array($catalog) && isset($catalog['invoiceSettings'])) {
-            $invoiceSettings = array_merge($invoiceSettings, $catalog['invoiceSettings']);
+        if (file_exists($catalogFile)) {
+            $catalog = json_decode(file_get_contents($catalogFile), true);
+            if (is_array($catalog) && isset($catalog['invoiceSettings'])) {
+                $invoiceSettings = array_merge($invoiceSettings, $catalog['invoiceSettings']);
+            }
         }
+        $foundOrder['invoiceSettings'] = $invoiceSettings;
     }
-    $foundOrder['invoiceSettings'] = $invoiceSettings;
 
     echo json_encode($foundOrder);
 } else {

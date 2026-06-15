@@ -111,7 +111,15 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
       items: cart,
       total,
       status: 'Payée',
-      paymentId
+      paymentId,
+      invoiceSettings: {
+        sellerName: invoiceSettings.sellerName,
+        sellerDetails: invoiceSettings.sellerDetails,
+        sellerEmail: invoiceSettings.sellerEmail,
+        sellerWebsite: invoiceSettings.sellerWebsite,
+        legalNotice: invoiceSettings.legalNotice,
+        footerText: invoiceSettings.footerText
+      }
     };
 
     try {
