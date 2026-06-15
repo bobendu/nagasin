@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import StoreApp from './StoreApp'
 import { motion } from 'framer-motion'
-import { Lock, Edit3 } from 'lucide-react'
+import { Lock, Edit3, Eye, EyeOff } from 'lucide-react'
 import OrderStatusTracking from './components/OrderStatusTracking'
 
 function App() {
@@ -11,6 +11,7 @@ function App() {
   const [adminToken, setAdminToken] = useState('') // Stocke le password pour l'API
   const [user, setUser] = useState('')
   const [trackingOrderId, setTrackingOrderId] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const [, setSecretClicks] = useState(0)
 
@@ -103,7 +104,33 @@ function App() {
           <h2 style={{ marginBottom: '2rem', fontSize: '1.2rem', fontWeight: 900 }}>ACCÈS RÉSERVÉ</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <input type="text" placeholder="Identifiant" value={user} onChange={(e) => setUser(e.target.value)} style={{ padding: '1rem', border: '1px solid #eee' }} />
-            <input type="password" placeholder="Mot de passe" value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: '1rem', border: '1px solid #eee' }} />
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <input 
+                type={showPassword ? "text" : "password"} 
+                placeholder="Mot de passe" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                style={{ padding: '1rem', paddingRight: '3rem', border: '1px solid #eee', width: '100%' }} 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '1rem',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#999',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '4px'
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             <button type="submit" style={{ background: '#000', color: '#fff', padding: '1rem', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
               <Lock size={16} /> SE CONNECTER
             </button>
