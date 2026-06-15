@@ -40,6 +40,14 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     price: 45,
     description: "Choisissez votre illustration préférée sur le blog (scrollez et cliquez) ou par mot clé ; je vous l'imprime, vous la mets sous cadre et je vous l'expédie."
   })
+  const [invoiceSettings, setInvoiceSettings] = useState({
+    sellerName: "Benoît Baudu (na!)",
+    sellerDetails: "Artiste-Auteur / NA! Studio",
+    sellerEmail: "contact@nagasin.fr",
+    sellerWebsite: "www.nagasin.fr",
+    legalNotice: "TVA non applicable - article 293 B du CGI",
+    footerText: "Facture acquittée. Mode de règlement : Carte Bancaire via Stripe.\nNagasin Studio par na! - Tous droits réservés."
+  })
 
   useEffect(() => {
     const draftCatalog = localStorage.getItem('nagasin_catalog_draft')
@@ -49,6 +57,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
         setProducts(draft.products || draft)
         if (draft.customPrintSettings) setCustomPrintSettings(draft.customPrintSettings)
         if (draft.shippingCost !== undefined) setShippingCost(draft.shippingCost)
+        if (draft.invoiceSettings) setInvoiceSettings(draft.invoiceSettings)
         setHasUnsavedChanges(true)
       } else {
         try {
@@ -59,6 +68,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
               setProducts(data.products);
               if (data.customPrintSettings) setCustomPrintSettings(data.customPrintSettings);
               if (data.shippingCost !== undefined) setShippingCost(data.shippingCost);
+              if (data.invoiceSettings) setInvoiceSettings(data.invoiceSettings);
             } else {
               setProducts(data);
             }
@@ -128,12 +138,19 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
     setHasUnsavedChanges(true)
   }
 
-  const saveDraft = (p: Product[], s: any, sc: number) => {
+  const saveDraft = (p: Product[], s: any, sc: number, inv: any = invoiceSettings) => {
     localStorage.setItem('nagasin_catalog_draft', JSON.stringify({ 
       products: p, 
       customPrintSettings: s,
-      shippingCost: sc 
+      shippingCost: sc,
+      invoiceSettings: inv
     }))
+  }
+
+  const handleUpdateInvoiceSettings = (settings: any) => {
+    setInvoiceSettings(settings)
+    saveDraft(products, customPrintSettings, shippingCost, settings)
+    setHasUnsavedChanges(true)
   }
 
   const handleUpdateCustomPrint = (settings: any) => {
@@ -185,7 +202,7 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
           'Content-Type': 'application/json',
           'X-Admin-Password': adminToken || ''
         },
-        body: JSON.stringify({ products, customPrintSettings, shippingCost })
+        body: JSON.stringify({ products, customPrintSettings, shippingCost, invoiceSettings })
       });
       if (!response.ok) throw new Error('Erreur publication');
       localStorage.removeItem('nagasin_catalog_draft')
@@ -332,6 +349,8 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
         adminToken={adminToken}
         shippingCost={shippingCost}
         onUpdateShipping={handleUpdateShipping}
+        invoiceSettings={invoiceSettings}
+        onUpdateInvoiceSettings={handleUpdateInvoiceSettings}
         onClose={() => setIsAdminDashboardOpen(false)} 
       />
 

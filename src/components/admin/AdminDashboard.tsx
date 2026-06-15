@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, TrendingUp, ShoppingBag, Users, Euro, Calendar, Printer, User, Mail, MapPin, CreditCard, Truck, CheckCircle2, Package, Send, AlertCircle } from 'lucide-react'
+import { X, TrendingUp, ShoppingBag, Users, Euro, Calendar, Printer, User, Mail, MapPin, CreditCard, Truck, CheckCircle2, Package, Send, AlertCircle, FileText } from 'lucide-react'
 
 interface Order {
   id: number;
@@ -12,12 +12,29 @@ interface Order {
   paymentId?: string;
 }
 
-export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCost, onUpdateShipping }: { 
+export default function AdminDashboard({ 
+  isOpen, 
+  onClose, 
+  adminToken, 
+  shippingCost, 
+  onUpdateShipping,
+  invoiceSettings,
+  onUpdateInvoiceSettings
+}: { 
   isOpen: boolean, 
   onClose: () => void, 
   adminToken?: string,
   shippingCost: number,
-  onUpdateShipping: (val: number) => void
+  onUpdateShipping: (val: number) => void,
+  invoiceSettings: {
+    sellerName: string;
+    sellerDetails: string;
+    sellerEmail: string;
+    sellerWebsite: string;
+    legalNotice: string;
+    footerText: string;
+  },
+  onUpdateInvoiceSettings: (settings: any) => void
 }) {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(false)
@@ -286,6 +303,75 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
                   <p style={{ fontSize: '0.85rem', color: '#666', margin: 0, maxWidth: '400px', lineHeight: 1.4 }}>
                     Ce montant est ajouté automatiquement au total de chaque panier client pour couvrir les frais de traitement et d'expédition.
                   </p>
+                </div>
+              </div>
+            </div>
+
+            {/* PARAMÈTRES DE LA FACTURE */}
+            <div 
+              style={{ marginBottom: '3rem', background: '#f8f9fa', borderRadius: '16px', border: '1px solid #eee' }}
+            >
+              <div style={{ padding: '2rem' }}>
+                <h3 style={{ fontSize: '0.8rem', fontWeight: 900, marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px', color: '#004169' }}>
+                  <FileText size={18} /> PARAMÈTRES DE LA FACTURE
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#666', display: 'block', marginBottom: '5px' }}>NOM DE L'ÉMETTEUR</label>
+                    <input 
+                      type="text" 
+                      value={invoiceSettings.sellerName || ''}
+                      onChange={(e) => onUpdateInvoiceSettings({ ...invoiceSettings, sellerName: e.target.value })}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.9rem', fontWeight: 600 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#666', display: 'block', marginBottom: '5px' }}>DÉTAILS / STUDIO</label>
+                    <input 
+                      type="text" 
+                      value={invoiceSettings.sellerDetails || ''}
+                      onChange={(e) => onUpdateInvoiceSettings({ ...invoiceSettings, sellerDetails: e.target.value })}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.9rem', fontWeight: 600 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#666', display: 'block', marginBottom: '5px' }}>EMAIL DE CONTACT</label>
+                    <input 
+                      type="email" 
+                      value={invoiceSettings.sellerEmail || ''}
+                      onChange={(e) => onUpdateInvoiceSettings({ ...invoiceSettings, sellerEmail: e.target.value })}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.9rem', fontWeight: 600 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#666', display: 'block', marginBottom: '5px' }}>SITE INTERNET</label>
+                    <input 
+                      type="text" 
+                      value={invoiceSettings.sellerWebsite || ''}
+                      onChange={(e) => onUpdateInvoiceSettings({ ...invoiceSettings, sellerWebsite: e.target.value })}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.9rem', fontWeight: 600 }}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#666', display: 'block', marginBottom: '5px' }}>MENTION DE TVA (OBLIGATOIRE SI EXONÉRÉ)</label>
+                    <input 
+                      type="text" 
+                      value={invoiceSettings.legalNotice || ''}
+                      onChange={(e) => onUpdateInvoiceSettings({ ...invoiceSettings, legalNotice: e.target.value })}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.9rem', fontWeight: 600 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 800, color: '#666', display: 'block', marginBottom: '5px' }}>TEXTE DE BAS DE PAGE</label>
+                    <textarea 
+                      rows={2}
+                      value={invoiceSettings.footerText || ''}
+                      onChange={(e) => onUpdateInvoiceSettings({ ...invoiceSettings, footerText: e.target.value })}
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.9rem', fontWeight: 600, fontFamily: 'Outfit, sans-serif' }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

@@ -22,7 +22,24 @@ interface OrderData {
   }>;
   total: number;
   status: 'Payée' | 'En préparation' | 'Expédiée';
+  invoiceSettings?: {
+    sellerName: string;
+    sellerDetails: string;
+    sellerEmail: string;
+    sellerWebsite: string;
+    legalNotice: string;
+    footerText: string;
+  };
 }
+
+const defaultInvoiceSettings = {
+  sellerName: "Benoît Baudu (na!)",
+  sellerDetails: "Artiste-Auteur / NA! Studio",
+  sellerEmail: "contact@nagasin.fr",
+  sellerWebsite: "www.nagasin.fr",
+  legalNotice: "TVA non applicable - article 293 B du CGI",
+  footerText: "Facture acquittée. Mode de règlement : Carte Bancaire via Stripe.\nNagasin Studio par na! - Tous droits réservés."
+};
 
 export default function OrderStatusTracking({ orderId, onClose }: OrderStatusTrackingProps) {
   const [order, setOrder] = useState<OrderData | null>(null);
@@ -94,6 +111,7 @@ export default function OrderStatusTracking({ orderId, onClose }: OrderStatusTra
   if (showInvoice) {
     const itemsTotal = order.items.reduce((sum, item) => sum + item.price, 0);
     const shipping = order.total - itemsTotal;
+    const inv = order.invoiceSettings || defaultInvoiceSettings;
 
     return (
       <div className="invoice-container-view" style={{ background: '#fafafa', minHeight: '100vh', padding: '3rem 1rem', fontFamily: 'Outfit, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -127,10 +145,10 @@ export default function OrderStatusTracking({ orderId, onClose }: OrderStatusTra
             <div>
               <h3 style={{ fontSize: '0.75rem', fontWeight: 900, color: '#999', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>ÉMETTEUR</h3>
               <p style={{ fontSize: '0.9rem', lineHeight: 1.5, margin: 0 }}>
-                <strong>Benoît Baudu (na!)</strong><br />
-                Artiste-Auteur / NA! Studio<br />
-                contact@nagasin.fr<br />
-                www.nagasin.fr
+                <strong>{inv.sellerName}</strong><br />
+                {inv.sellerDetails}<br />
+                {inv.sellerEmail}<br />
+                {inv.sellerWebsite}
               </p>
             </div>
             <div>
@@ -194,10 +212,9 @@ export default function OrderStatusTracking({ orderId, onClose }: OrderStatusTra
 
           {/* Mentions Légales Obligatoires (Bas de page) */}
           <div style={{ borderTop: '1px solid #eee', paddingTop: '2rem', marginTop: 'auto', fontSize: '0.75rem', color: '#666', lineHeight: 1.5, textAlign: 'center' }}>
-            <p style={{ margin: '0 0 8px 0', fontWeight: 700 }}>TVA non applicable - article 293 B du CGI</p>
-            <p style={{ margin: 0 }}>
-              Facture acquittée. Mode de règlement : Carte Bancaire via Stripe.<br />
-              Nagasin Studio par na! - Tous droits réservés.
+            <p style={{ margin: '0 0 8px 0', fontWeight: 700 }}>{inv.legalNotice}</p>
+            <p style={{ margin: 0, whiteSpace: 'pre-line' }}>
+              {inv.footerText}
             </p>
           </div>
         </div>
