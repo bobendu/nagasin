@@ -439,32 +439,34 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
         )}
       </AnimatePresence>
 
-      <motion.div 
-        onClick={() => setIsCartOpen(true)}
-        animate={{ 
-          scale: justAdded ? [1, 1.05, 1] : 1,
-          backgroundColor: justAdded ? '#00c853' : '#004169'
-        }}
-        className="sticky-cart-bar"
-        style={{ 
-          color: 'white', 
-          padding: '1rem 2rem', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          gap: '15px', 
-          cursor: 'pointer', 
-          zIndex: 150,
-          boxShadow: '0 -5px 20px rgba(0,0,0,0.1)',
-          fontWeight: 900,
-          letterSpacing: '2px',
-          fontSize: '0.9rem',
-          textTransform: 'uppercase'
-        }}
-      >
-        <ShoppingCart size={20} strokeWidth={3} />
-        {justAdded ? 'ARTICLE AJOUTÉ !' : `VOIR MON PANIER (${cart.length}) — ${total.toFixed(2)} €`}
-      </motion.div>
+      {!isCartOpen && (
+        <motion.div 
+          onClick={() => setIsCartOpen(true)}
+          animate={{ 
+            scale: justAdded ? [1, 1.05, 1] : 1,
+            backgroundColor: justAdded ? '#00c853' : '#004169'
+          }}
+          className="sticky-cart-bar"
+          style={{ 
+            color: 'white', 
+            padding: '1rem 2rem', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: '15px', 
+            cursor: 'pointer', 
+            zIndex: 150,
+            boxShadow: '0 -5px 20px rgba(0,0,0,0.1)',
+            fontWeight: 900,
+            letterSpacing: '2px',
+            fontSize: '0.9rem',
+            textTransform: 'uppercase'
+          }}
+        >
+          <ShoppingCart size={20} strokeWidth={3} />
+          {justAdded ? 'ARTICLE AJOUTÉ !' : `VOIR MON PANIER (${cart.length}) — ${total.toFixed(2)} €`}
+        </motion.div>
+      )}
 
       <LegalModals activeDoc={activeLegalDoc} onClose={() => setActiveLegalDoc(null)} />
     </div>
