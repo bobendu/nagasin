@@ -309,81 +309,97 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
                   Aucune commande enregistrée.
                 </div>
               ) : (
-                orders.map((o) => (
-                  <div key={o.id} style={{ background: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden', opacity: updatingId === o.id ? 0.6 : 1 }}>
-                    <div style={{ padding: '1.5rem 2rem', background: '#fafafa', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-                         <div><span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#999', display: 'block' }}>RÉFÉRENCE</span><span style={{ fontWeight: 800 }}>#{o.id.toString().slice(-6)}</span></div>
-                         <div><span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#999', display: 'block' }}>CLIENT</span><span style={{ fontWeight: 800 }}>{o.customer.name}</span></div>
-                         <div><span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#999', display: 'block' }}>DATE</span><span style={{ fontWeight: 600 }}>{new Date(o.date).toLocaleDateString()}</span></div>
-                         {o.paymentId && (
-                            <div>
-                              <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#999', display: 'block' }}>PAIEMENT</span>
-                              <span style={{ fontSize: '0.7rem', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <CreditCard size={10} /> {o.paymentId}
-                              </span>
-                            </div>
-                         )}
-                       </div>
-                       <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-                         <span style={{ fontSize: '1.1rem', fontWeight: 900 }}>{o.total.toFixed(2)} €</span>
-                         
-                         <div style={{ display: 'flex', gap: '5px' }}>
-                           <StatusButton 
-                            active={o.status === 'Payée'} 
-                            color="#22c55e" 
-                            icon={<CheckCircle2 size={12} />} 
-                            label="Payée" 
-                            onClick={() => setPendingChange({ id: o.id, status: 'Payée', customer: o.customer.name })} 
-                           />
-                           <StatusButton 
-                            active={o.status === 'En préparation'} 
-                            color="#f59e0b" 
-                            icon={<Package size={12} />} 
-                            label="Préparation" 
-                            onClick={() => setPendingChange({ id: o.id, status: 'En préparation', customer: o.customer.name })} 
-                           />
-                           <StatusButton 
-                            active={o.status === 'Expédiée'} 
-                            color="#3b82f6" 
-                            icon={<Send size={12} />} 
-                            label="Expédiée" 
-                            onClick={() => setPendingChange({ id: o.id, status: 'Expédiée', customer: o.customer.name })} 
-                           />
+                orders.map((o) => {
+                  const itemsSubtotal = o.items.reduce((sum, item) => sum + (item.price || 0), 0);
+                  const shipping = o.total - itemsSubtotal;
+                  return (
+                    <div key={o.id} style={{ background: '#fff', borderRadius: '16px', border: '1px solid #eee', overflow: 'hidden', opacity: updatingId === o.id ? 0.6 : 1 }}>
+                      <div style={{ padding: '1.5rem 2rem', background: '#fafafa', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                         <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                           <div><span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#999', display: 'block' }}>RÉFÉRENCE</span><span style={{ fontWeight: 800 }}>#{o.id.toString().slice(-6)}</span></div>
+                           <div><span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#999', display: 'block' }}>CLIENT</span><span style={{ fontWeight: 800 }}>{o.customer.name}</span></div>
+                           <div><span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#999', display: 'block' }}>DATE</span><span style={{ fontWeight: 600 }}>{new Date(o.date).toLocaleDateString()}</span></div>
+                           {o.paymentId && (
+                              <div>
+                                <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#999', display: 'block' }}>PAIEMENT</span>
+                                <span style={{ fontSize: '0.7rem', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                  <CreditCard size={10} /> {o.paymentId}
+                                </span>
+                              </div>
+                           )}
                          </div>
-                       </div>
-                    </div>
-                    
-                    <div style={{ padding: '1.5rem 2rem', display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                        {o.items.map((item, idx) => (
-                          <div key={idx} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                            <img src={item.image} style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #eee' }} />
-                            <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: '0.9rem', fontWeight: 800 }}>{item.title}</div>
-                              {item.dedication && <div style={{ fontSize: '0.75rem', fontStyle: 'italic', color: 'var(--primary-color)', fontWeight: 600 }}>Dédicace : "{item.dedication}"</div>}
+                         <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                           <span style={{ fontSize: '1.1rem', fontWeight: 900 }}>{o.total.toFixed(2)} €</span>
+                           
+                           <div style={{ display: 'flex', gap: '5px' }}>
+                             <StatusButton 
+                              active={o.status === 'Payée'} 
+                              color="#22c55e" 
+                              icon={<CheckCircle2 size={12} />} 
+                              label="Payée" 
+                              onClick={() => setPendingChange({ id: o.id, status: 'Payée', customer: o.customer.name })} 
+                             />
+                             <StatusButton 
+                              active={o.status === 'En préparation'} 
+                              color="#f59e0b" 
+                              icon={<Package size={12} />} 
+                              label="Préparation" 
+                              onClick={() => setPendingChange({ id: o.id, status: 'En préparation', customer: o.customer.name })} 
+                             />
+                             <StatusButton 
+                              active={o.status === 'Expédiée'} 
+                              color="#3b82f6" 
+                              icon={<Send size={12} />} 
+                              label="Expédiée" 
+                              onClick={() => setPendingChange({ id: o.id, status: 'Expédiée', customer: o.customer.name })} 
+                             />
+                           </div>
+                         </div>
+                      </div>
+                      
+                      <div style={{ padding: '1.5rem 2rem', display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                          {o.items.map((item, idx) => (
+                            <div key={idx} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                              <img src={item.image} style={{ width: '50px', height: '50px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #eee' }} />
+                              <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: '0.9rem', fontWeight: 800 }}>{item.title}</div>
+                                <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#666', marginTop: '2px' }}>{item.price.toFixed(2)} €</div>
+                                {item.dedication && <div style={{ fontSize: '0.75rem', fontStyle: 'italic', color: 'var(--primary-color)', fontWeight: 600 }}>Dédicace : "{item.dedication}"</div>}
+                              </div>
+                              {item.customImage && (
+                                <button 
+                                  onClick={() => printImage(item.customImage)}
+                                  style={{ background: '#000', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                >
+                                  <Printer size={14} /> IMPRIMER
+                                </button>
+                              )}
                             </div>
-                            {item.customImage && (
-                              <button 
-                                onClick={() => printImage(item.customImage)}
-                                style={{ background: '#000', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
-                              >
-                                <Printer size={14} /> IMPRIMER
-                              </button>
-                            )}
+                          ))}
+                        </div>
+  
+                        <div style={{ background: '#f8f9fa', padding: '1.5rem', borderRadius: '12px', fontSize: '0.85rem', border: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <h4 style={{ fontSize: '0.7rem', fontWeight: 900, color: '#999', marginBottom: '5px', letterSpacing: '1px' }}>EXPÉDITION</h4>
+                          <div style={{ display: 'flex', gap: '10px' }}><User size={16} color="#666" /> <strong>{o.customer.name}</strong></div>
+                          <div style={{ display: 'flex', gap: '10px' }}><Mail size={16} color="#666" /> {o.customer.email}</div>
+                          <div style={{ display: 'flex', gap: '10px', marginBottom: '5px' }}><MapPin size={16} color="#666" /> {o.customer.addr}</div>
+                          
+                          <div style={{ borderTop: '1px dashed #ddd', paddingTop: '10px', marginTop: '5px', fontSize: '0.8rem', color: '#555' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                              <span>Sous-total articles :</span>
+                              <strong>{itemsSubtotal.toFixed(2)} €</strong>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                              <span>Frais d'expédition :</span>
+                              <strong>{shipping.toFixed(2)} €</strong>
+                            </div>
                           </div>
-                        ))}
-                      </div>
-
-                      <div style={{ background: '#f8f9fa', padding: '1.5rem', borderRadius: '12px', fontSize: '0.85rem', border: '1px solid #eee' }}>
-                        <h4 style={{ fontSize: '0.7rem', fontWeight: 900, color: '#999', marginBottom: '1rem', letterSpacing: '1px' }}>EXPÉDITION</h4>
-                        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}><User size={16} color="#666" /> <strong>{o.customer.name}</strong></div>
-                        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}><Mail size={16} color="#666" /> {o.customer.email}</div>
-                        <div style={{ display: 'flex', gap: '10px' }}><MapPin size={16} color="#666" /> {o.customer.addr}</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
