@@ -94,17 +94,87 @@ export default function AdminDashboard({ isOpen, onClose, adminToken, shippingCo
   const printImage = (url: string) => {
     try {
       const sanitizedUrl = new URL(url).toString();
+      // Résout la version haute résolution originale si c'est une image de blog WordPress redimensionnée
+      const highResUrl = sanitizedUrl.replace(/-\d+x\d+(\.[a-zA-Z]+)$/, '$1');
       const win = window.open('', '_blank')
       if (win) {
         win.document.write(`
           <html>
-            <head><title>Impression Tirage</title></head>
-            <body style="margin:0; display:flex; align-items:center; justify-content:center; height:100vh; background:#000;">
-              <img id="print-img" style="max-width:100%; max-height:100%; object-fit:contain;" />
+            <head>
+              <title>Impression Tirage - Nagasin</title>
+              <style>
+                html, body {
+                  margin: 0;
+                  padding: 0;
+                  min-height: 100vh;
+                  background: #111;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  font-family: system-ui, sans-serif;
+                }
+                #print-img {
+                  max-width: 90vw;
+                  max-height: 75vh;
+                  object-fit: contain;
+                  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                  border: 2px solid #fff;
+                  background: #fff;
+                }
+                @media print {
+                  @page {
+                    size: auto;
+                    margin: 0;
+                  }
+                  html, body {
+                    background: #fff !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    display: block !important;
+                  }
+                  .no-print {
+                    display: none !important;
+                  }
+                  #print-img {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    max-width: 100% !important;
+                    max-height: 100% !important;
+                    object-fit: contain !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    z-index: 9999 !important;
+                  }
+                }
+              </style>
+            </head>
+            <body>
+              <div class="no-print" style="text-align: center; margin-bottom: 20px; color: #fff; padding: 20px;">
+                <h2 style="margin: 0 0 10px 0;">Préparation de l'impression (Haute Résolution)</h2>
+                <p style="color: #aaa; font-size: 0.85rem; margin: 0 0 15px 0;">
+                  Pour un résultat optimal, décochez "En-têtes et pieds de page" et réglez les marges sur "Aucune" dans la boîte de dialogue d'impression.
+                </p>
+                <button onclick="window.print()" style="background: #004169; color: #fff; border: none; padding: 10px 24px; font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;">
+                  Lancer l'impression
+                </button>
+              </div>
+              
+              <img id="print-img" alt="Tirage d'art" />
+
               <script>
                 const img = document.getElementById('print-img');
-                img.src = ${JSON.stringify(sanitizedUrl)};
-                img.onload = () => { window.print(); };
+                img.src = ${JSON.stringify(highResUrl)};
+                img.onload = () => {
+                  setTimeout(() => { window.print(); }, 300);
+                };
               </script>
             </body>
           </html>
