@@ -445,12 +445,8 @@ export default function StoreApp({ isAdmin, adminToken, onLogout, onGoToLogin }:
           scale: justAdded ? [1, 1.05, 1] : 1,
           backgroundColor: justAdded ? '#00c853' : '#004169'
         }}
+        className="sticky-cart-bar"
         style={{ 
-          position: 'fixed', 
-          bottom: 0, 
-          left: 0, 
-          right: 0, 
-          background: '#004169', 
           color: 'white', 
           padding: '1rem 2rem', 
           display: 'flex', 
