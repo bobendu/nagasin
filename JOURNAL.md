@@ -158,5 +158,7 @@
   - `/api/order_status.php` : Sanitization stricte des identifiants de commande contre les traversées de répertoires.
 - **Nettoyage des identifiants dans le dépôt Git** :
   - Retrait des mots de passe en clair dans `RULES.md`.
+  - Exclusion définitive de `RULES.md` du suivi Git (`git rm --cached`) et ajout au `.gitignore` pour conserver les accès uniquement en local sur la machine de développement.
+
 
 
