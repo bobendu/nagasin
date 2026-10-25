@@ -7,11 +7,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-$orderId = $_GET['id'] ?? '';
+$rawOrderId = $_GET['id'] ?? '';
+$orderId = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)$rawOrderId);
 
 if (!$orderId) {
     http_response_code(400);
-    echo json_encode(["error" => "ID de commande manquant"]);
+    echo json_encode(["error" => "ID de commande manquant ou invalide"]);
     exit;
 }
 

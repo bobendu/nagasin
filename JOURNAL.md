@@ -142,3 +142,21 @@
   - Écrasement de `public/api/test_mail.php` par un script désactivé (HTTP 410 Gone et auto-suppression serveur `@unlink`).
   - Déploiement automatique vers la production OVH via GitHub Actions pour écraser la version orpheline présente sur l'hébergement.
 
+## 2026-10-25 : Audit complet & Durcissement de sécurité global
+- **Neutralisation des scripts orphelins sensibles** :
+  - `upload.php` : neutralisé (HTTP 410 + `@unlink`) pour éliminer tout risque d'upload arbitraire ou d'exécution de webshell.
+  - `save_products.php` : neutralisé (HTTP 410 + `@unlink`) pour interdire toute réécriture non authentifiée de `products.json`.
+- **Protection des données sensibles (`public/data/`)** :
+  - `.htaccess` de `public/data/` durci avec `Require all denied` (Apache 2.4+) et `Deny from all` (Apache 2.2).
+  - Règle de blocage explicite `RewriteRule ^data(/.*)?$ - [F,L]` ajoutée au `.htaccess` racine pour interdire tout accès web direct aux fichiers de commandes et catalogue.
+- **Durcissement du `.htaccess` racine** :
+  - Désactivation du listage des répertoires (`Options -Indexes`).
+  - Ajout des en-têtes HTTP de sécurité (`X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `X-XSS-Protection: 1; mode=block`, `Referrer-Policy: strict-origin-when-cross-origin`).
+  - Blocage strict des fichiers cachés (`.git`, `.env`, `.ovhconfig`, etc.) et d'éventuels scripts PHP dans `/items/`.
+- **Validation stricte des APIs actives** :
+  - `/api/save_order.php` : Validation stricte des données de commande, contrôle du format email avec `filter_var`, assainissement contre les injections d'en-têtes CRLF et sanitization XSS des noms.
+  - `/api/order_status.php` : Sanitization stricte des identifiants de commande contre les traversées de répertoires.
+- **Nettoyage des identifiants dans le dépôt Git** :
+  - Retrait des mots de passe en clair dans `RULES.md`.
+
+

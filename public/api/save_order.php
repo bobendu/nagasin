@@ -8,14 +8,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
     echo json_encode(["error" => "Method not allowed"]);
     exit;
 }
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (!$data) {
-    echo json_encode(["error" => "No data provided"]);
+if (!is_array($data) || empty($data['id']) || !isset($data['total'])) {
+    http_response_code(400);
+    echo json_encode(["error" => "Données de commande invalides"]);
+    exit;
+}
+
+// Validation stricte du client et de l'email
+$customer = $data['customer'] ?? null;
+if (!is_array($customer) || empty($customer['email'])) {
+    http_response_code(400);
+    echo json_encode(["error" => "Email client manquant"]);
+    exit;
+}
+
+$rawEmail = trim((string)$customer['email']);
+// Protection contre l'injection d'en-têtes et validation format email
+$rawEmail = str_replace(["\r", "\n"], '', $rawEmail);
+if (!filter_var($rawEmail, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    echo json_encode(["error" => "Format d'email invalide"]);
     exit;
 }
 
@@ -29,16 +48,21 @@ if (!file_exists($file)) {
 $orders = json_decode(file_get_contents($file), true);
 if (!is_array($orders)) $orders = [];
 
+// Assainissement des données sauvegardées
+$cleanOrder = $data;
+$cleanOrder['customer']['email'] = $rawEmail;
+$cleanOrder['customer']['name'] = htmlspecialchars(strip_tags((string)($customer['name'] ?? '')), ENT_QUOTES, 'UTF-8');
+
 // Ajout de la nouvelle commande en haut de liste
-array_unshift($orders, $data);
+array_unshift($orders, $cleanOrder);
 
 if (file_put_contents($file, json_encode($orders, JSON_PRETTY_PRINT))) {
     
     // ENVOI DE L'EMAIL DE CONFIRMATION AU CLIENT
-    $to = $data['customer']['email'];
-    $orderId = $data['id'];
-    $customerName = $data['customer']['name'];
-    $total = $data['total'];
+    $to = $rawEmail;
+    $orderId = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)$cleanOrder['id']);
+    $customerName = $cleanOrder['customer']['name'];
+    $total = floatval($cleanOrder['total']);
     
     $subject = "Confirmation de votre commande Nagasin #" . substr($orderId, -6);
     $subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';

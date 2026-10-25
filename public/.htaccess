@@ -1,11 +1,34 @@
 DirectoryIndex index.html
 
+# Désactiver le listage des répertoires
+Options -Indexes
+
+# En-têtes de sécurité HTTP
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # 1. Bloquer strictement tout accès direct aux données sensibles
+  RewriteRule ^data(/.*)?$ - [F,L]
+
+  # 2. Bloquer les fichiers cachés, configs et fichiers de documentation
+  RewriteRule (^|/)\.(git|env|ovhconfig|htaccess) - [F,L]
+  RewriteRule \.(md|log|json\.bak)$ - [F,L]
+
+  # 3. Empêcher l'exécution de tout script PHP dans le dossier de médias
+  RewriteRule ^items/.*\.php$ - [F,L]
+
+  # 4. Règles standard du SPA
   RewriteRule ^index\.html$ - [L]
-  
-  # Ignorer le dossier API pour laisser le PHP s'exécuter
+
+  # Laisser le dossier API exécuter ses scripts PHP autorisés
   RewriteRule ^api/.*$ - [L]
 
   RewriteCond %{REQUEST_FILENAME} !-f
