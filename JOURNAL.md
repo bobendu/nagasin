@@ -135,3 +135,10 @@
   - **Éditeur de facture** : Ajout d'un panneau de configuration des informations d'en-tête de facture (nom, adresse, email, site, mentions TVA, bas de page) dans le dashboard d'administration.
   - **Figeage à la commande (Inaltérabilité)** : Conformément à l'article 286 du CGI, les réglages de facturation en vigueur lors de l'achat sont figés et enregistrés de manière irréversible dans la commande dans [StoreApp.tsx](file:///c:/Users/dubo/.gemini/antigravity/scratch/nagasin/src/StoreApp.tsx) lors de la commande.
   - **Intégration API & Rendu Client** : Adaptation de [order_status.php](file:///c:/Users/dubo/.gemini/antigravity/scratch/nagasin/public/api/order_status.php) et [OrderStatusTracking.tsx](file:///c:/Users/dubo/.gemini/antigravity/scratch/nagasin/src/components/OrderStatusTracking.tsx) pour charger, renvoyer et restituer prioritairement ces données figées, tout en utilisant la configuration globale comme valeur de repli pour les anciennes commandes.
+
+## 2026-10-25 : Neutralisation du script orphelin test_mail.php
+- **Contexte** : Réception d'un email de test automatique à 20:43:03 suite à l'appel HTTP d'un bot/scanner web sur l'ancienne URL de diagnostic.
+- **Action corrective** :
+  - Écrasement de `public/api/test_mail.php` par un script désactivé (HTTP 410 Gone et auto-suppression serveur `@unlink`).
+  - Déploiement automatique vers la production OVH via GitHub Actions pour écraser la version orpheline présente sur l'hébergement.
+
